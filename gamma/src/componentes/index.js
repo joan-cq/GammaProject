@@ -1,0 +1,15 @@
+export { default as ComponenteContacto } from "./ComponenteContacto";
+export { default as ComponenteNotas } from "./ComponenteNotas";
+export { default as ComponenteInicio } from "./ComponenteInicio";
+export { default as ComponenteLogin } from "./ComponenteLogin";
+export { default as ComponenteLogros } from "./ComponenteLogros";
+export { default as ComponenteNosotros } from "./ComponenteNosotros";
+export { default as ComponentePanelAdmin } from "./ComponentePanelAdmin";
+export { default as ComponentePanelProfesores } from "./ComponentePanelProfesores";
+export { default as ComponenteAlumnos } from "./ComponenteAlumnos";
+export { default as ComponenteCursos } from "./ComponenteCursos";
+export { default as ComponenteAdmin } from "./ComponenteAdmin";
+export { default as ComponenteUpdatePassword } from "./ComponenteUpdatePassword";
+export { default as ComponenteProNotas } from "./ComponenteProNotas";
+export { default as ComponenteAsistencia } from "./ComponenteAsistencia";
+export { default as ComponenteProfesores } from "./ComponenteProfesores";

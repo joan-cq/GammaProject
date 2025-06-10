@@ -1,0 +1,152 @@
+package com.gamma.backend.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import com.gamma.backend.model.Alumno;
+import com.gamma.backend.model.User;
+import com.gamma.backend.repository.AlumnoRepository;
+import com.gamma.backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class AlumnoController {
+
+    @Autowired
+    private AlumnoRepository alumnoRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @GetMapping("/alumno/list")
+    public ResponseEntity<List<Alumno>> listarAlumnos() {
+        List<Alumno> alumnos = alumnoRepository.findAll();
+        for (Alumno alumno : alumnos) {
+            if (alumno.getUser() != null) {
+                alumno.setRol(alumno.getUser().getRol());
+                alumno.setClave(alumno.getUser().getClave());
+            }
+        }
+        return ResponseEntity.ok(alumnos);
+    }
+
+    @PutMapping("/alumno/update")
+    public ResponseEntity<Alumno> actualizarAlumno(@RequestBody Alumno Alumno) {
+        // Obtener el Alumno existente de la base de datos
+        Alumno AlumnoExistente = alumnoRepository.findById(Alumno.getDni()).orElse(null);
+
+        if (AlumnoExistente != null) {
+            // Actualizar los atributos del Alumno existente
+            AlumnoExistente.setNombre(Alumno.getNombre());
+            AlumnoExistente.setApellido(Alumno.getApellido());
+            AlumnoExistente.setCelularApoderado(Alumno.getCelularApoderado());
+            AlumnoExistente.setGenero(Alumno.getGenero());
+            AlumnoExistente.setGrado(Alumno.getGrado());
+            AlumnoExistente.setNivel(Alumno.getNivel());
+            AlumnoExistente.setEstado(Alumno.getEstado());
+
+            // Obtener el usuario asociado al Alumno
+            User user = Alumno.getUser();
+
+            // Actualizar el atributo rol en el usuario si no es nulo
+            if (user != null) {
+                if (AlumnoExistente.getUser() != null) {
+                    AlumnoExistente.getUser().setRol(user.getRol());
+                    userRepository.save(AlumnoExistente.getUser());
+                } else {
+                }
+            }
+
+            Alumno AlumnoActualizado = alumnoRepository.save(AlumnoExistente);
+            return ResponseEntity.ok(AlumnoActualizado);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/alumno/add")
+    public ResponseEntity<?> agregarAlumno(@RequestBody Map<String, String> payload) {
+        String dni = payload.get("dni");
+        String nombre = payload.get("nombre");
+        String apellido = payload.get("apellido");
+        String celularApoderado = payload.get("celularApoderado");
+        String rol = payload.get("rol");
+        String clave = payload.get("clave");
+        String estado = payload.get("estado");
+        String genero = payload.get("genero");
+        String nivel = payload.get("nivel");
+        String grado = payload.get("grado");
+
+        // Crear el usuario
+        User user = new User();
+        user.setDni(dni);
+        user.setClave(clave);
+        user.setRol(rol);
+        userRepository.save(user);
+
+        // Crear el Alumno
+        Alumno Alumno = new Alumno();
+        Alumno.setDni(dni);
+        Alumno.setNombre(nombre);
+        Alumno.setApellido(apellido);
+        Alumno.setCelularApoderado(celularApoderado);
+        Alumno.setEstado(estado);
+        Alumno.setGenero(genero);
+        Alumno.setNivel(nivel);
+        Alumno.setGrado(grado);
+        alumnoRepository.save(Alumno);
+
+        return ResponseEntity.ok(Map.of("mensaje", "Alumno agregado con éxito"));
+    }
+
+    @DeleteMapping("/alumno/delete/{dni}")
+    public ResponseEntity<?> eliminarAlumno(@PathVariable String dni) {
+        // Primero, buscar el Alumno por DNI
+        Alumno Alumno = alumnoRepository.findById(dni).orElse(null);
+
+        if (Alumno != null) {
+            // Eliminar el Alumno de la tabla Alumno
+            alumnoRepository.deleteById(dni);
+
+            // Obtener el usuario asociado al Alumno
+            User user = Alumno.getUser();
+
+            if (user != null) {
+                // Eliminar el usuario de la tabla User
+                userRepository.deleteById(user.getDni());
+            }
+
+            return ResponseEntity.ok(Map.of("mensaje", "Alumno eliminado con éxito"));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/alumno/updatePassword/{dni}")
+    public ResponseEntity<?> actualizarPassword(@PathVariable String dni, @RequestBody Map<String, String> payload) {
+        // Obtener la nueva contraseña del payload
+        String nuevaClave = payload.get("nuevaClave");
+
+        // Obtener el Alumno existente de la base de datos
+        Alumno AlumnoExistente = alumnoRepository.findById(dni).orElse(null);
+
+        if (AlumnoExistente != null) {
+            // Obtener el usuario asociado al Alumno
+            User user = AlumnoExistente.getUser();
+
+            if (user != null) {
+                // Actualizar la contraseña del usuario
+                user.setClave(nuevaClave);
+                userRepository.save(user);
+
+                return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada con éxito"));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}

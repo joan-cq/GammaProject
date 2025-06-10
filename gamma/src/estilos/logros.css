@@ -1,0 +1,78 @@
+/* Seccion Logros */
+.seccion-logros {
+    height: auto;
+    padding: 60px 0;
+}
+.seccion-logros header {
+    font-family: "Caveat";
+    font-size: 50px;
+    text-align: center;
+    font-weight: bold;
+    color: #970013;
+}
+.seccion-logros .contenedor {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    align-items: center;
+    justify-content: center;   
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    padding: 20px;
+    outline: 2px solid white;
+}
+.seccion-logros div {
+    background-color: white;
+    outline: 2px solid #892525;
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+}
+.seccion-logros .contenedor div span{
+    font-family: "Montserrat";
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    float: right;
+    margin-top: 3px;
+}
+.seccion-logros .contenedor div:nth-child(1) div {
+    background-image: url("../recursos/piero.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.seccion-logros .contenedor div:nth-child(2) div {
+    background-image: url("../recursos/lenin.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.seccion-logros .contenedor div:nth-child(3) div {
+    background-image: url("../recursos/angelina.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.seccion-logros .contenedor div:nth-child(4) div {
+    background-image: url("../recursos/santiago.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.seccion-logros .contenedor div:nth-child(5) div {
+    background-image: url("../recursos/anderson.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.seccion-logros .contenedor div:nth-child(6) div {
+    background-image: url("../recursos/cristian.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}

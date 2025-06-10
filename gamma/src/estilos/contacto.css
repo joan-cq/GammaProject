@@ -1,0 +1,71 @@
+/* Contacto */
+.contenedor-contac h1 {
+    padding: 20px 0;
+    text-align: center;
+    font-family: "Caveat";
+    color: #970013;
+    font-weight: bold;
+    font-size: 50px;
+}
+.contenedor-contac h4 {
+    font-family: "Caveat";
+}
+.contenedor-contac {
+    padding: 20px 0;
+    height: 500px;
+}
+.contenedor-contac .row {
+    height: 400px;
+    margin: 0;
+    padding: 40px 20px !important;
+}
+.contenedor-contac .row .info {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.contenedor-contac .row .formulario {
+    background-color: #970013;
+    color: white;
+    padding: 20px;
+    height: 100%;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+}
+form {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+input[type=text], input[type=email], input[type=number], textarea {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 2px solid #ccc;
+}
+textarea {
+    min-height: 50px;
+    max-height: 50px;
+}
+input[type=submit] {
+    background-color: #FDD61D;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 25px;
+    color: black;
+}
+input[type=submit]:hover {
+    background-color: #af9b37;
+}

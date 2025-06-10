@@ -1,0 +1,70 @@
+-- Tabla de usuarios (base)
+CREATE TABLE usuario (
+    dni VARCHAR(8) PRIMARY KEY,
+    clave VARCHAR(255) NOT NULL,
+    rol ENUM('ADMINISTRADOR', 'PROFESOR', 'ALUMNO') NOT NULL
+);
+
+-- Tabla de administradores
+CREATE TABLE administrador (
+    dni VARCHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    celular VARCHAR(9),
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (dni) REFERENCES usuario(dni) ON DELETE CASCADE
+);
+
+-- Tabla de profesores
+CREATE TABLE profesor (
+    dni VARCHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    celular VARCHAR(9),
+    codigo_curso VARCHAR(20),
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (dni) REFERENCES usuario(dni) ON DELETE CASCADE
+);
+
+-- Tabla de alumnos
+CREATE TABLE alumno (
+    dni VARCHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    celular_apoderado VARCHAR(9),
+    genero ENUM('MASCULINO', 'FEMENINO'),
+    grado VARCHAR(20), -- ej: '1ro', '2do', etc.
+    nivel ENUM('PRIMARIA', 'SECUNDARIA'),
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (dni) REFERENCES usuario(dni) ON DELETE CASCADE
+);
+
+-- Tabla de cursos
+CREATE TABLE curso (
+    codigo_curso VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    nivel ENUM('PRIMARIA', 'SECUNDARIA') NOT NULL,
+    grado VARCHAR(20) NOT NULL
+);
+
+-- Tabla de años escolares
+CREATE TABLE anio_escolar (
+    id_anio INT AUTO_INCREMENT PRIMARY KEY,
+    anio INT NOT NULL UNIQUE,
+    activo BOOLEAN DEFAULT FALSE,
+    fecha_inicio DATE,
+    fecha_fin DATE
+);
+
+-- Tabla de notas
+CREATE TABLE nota (
+    id_nota INT AUTO_INCREMENT PRIMARY KEY,
+    dni_alumno VARCHAR(20) NOT NULL,
+    codigo_curso VARCHAR(20) NOT NULL,
+    id_anio INT NOT NULL,
+    nota DECIMAL(2,2),
+    editable BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (dni_alumno) REFERENCES alumno(dni) ON DELETE CASCADE,
+    FOREIGN KEY (codigo_curso) REFERENCES curso(codigo_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_anio) REFERENCES anio_escolar(id_anio) ON DELETE CASCADE
+);

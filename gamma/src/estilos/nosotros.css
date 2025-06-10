@@ -1,0 +1,329 @@
+/* Seccion Nosotros */
+.sec-nosotros {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    margin: 40px auto;
+}
+.sec-nosotros h1 {
+    font-family: "Caveat", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    color: #970013;
+    text-transform: uppercase;
+    font-size: 60px;
+}
+.sec-nosotros p {
+    text-align: justify;
+    font-size: 24px;
+    font-family: "Montserrat";
+    font-weight: 400;
+}
+/* Video */
+.video {
+    height: 400px;
+    padding: 0;
+    margin-bottom: 50px;
+}
+.video video {
+    width: 100%;
+    height: 100%;
+}
+/* Seccion Principios */
+.sec-principios {
+    height: auto;
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    margin-bottom: 30px;
+    padding: 0;
+}
+.sec-principios div {
+    padding: 20px;
+    min-height: 90px;
+    max-height: 90px;
+    text-align: center;
+    width: 50%;
+    border-radius: 20px;
+    transition: all ease-in-out 0.5s;
+    -webkit-transition: all ease-in-out 0.5s;
+    -moz-transition: all ease-in-out 0.5s;
+    -ms-transition: all ease-in-out 0.5s;
+    -o-transition: all ease-in-out 0.5s;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    border: 3px solid #d3ac00d2;
+    position: relative;
+    z-index: 0;
+    color: white;
+}
+.sec-principios div:hover {
+    max-height: 500px;
+}
+.sec-principios div:nth-child(1)::before {
+    content: "";
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url("../recursos/0.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1;
+    filter: brightness(20%);
+    -webkit-filter: brightness(20%);
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+}
+.sec-principios div:nth-child(2)::before {
+    content: "";
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url("../recursos/6.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1;
+    filter: brightness(20%);
+    -webkit-filter: brightness(20%);
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+}
+.sec-principios h1 {
+    color: #970013;
+    font-family: "Caveat";
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.sec-principios p {
+    text-align: justify;
+    transition: all ease-in-out 0.1s;
+    -webkit-transition: all ease-in-out 0.1s;
+    -moz-transition: all ease-in-out 0.1s;
+    -ms-transition: all ease-in-out 0.1s;
+    -o-transition: all ease-in-out 0.1s;
+    visibility: hidden;
+}
+.sec-principios div:hover p {
+    visibility: visible;
+    transition-delay: 0.3s;
+}
+/* Carrusel */
+.seccion-propuesta {
+    height: 800px;
+    padding: 0;
+    margin-bottom: 50px;
+}
+.seccion-propuesta .row {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+.seccion-propuesta .row .imagenNosotros{
+    background-image: url("../recursos/imagenquieta.png");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.seccion-propuesta .row .informacionNosotros {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    gap: 10px;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(1)  {
+    background-image: url("../recursos/0.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    outline: 1px solid #970013;
+    width: 100%;
+    height: 14%;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(1):hover {
+    height: 30%;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(2) {
+    background-image: url("../recursos/1.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    outline: 1px solid #970013;
+    width: 100%;
+    height: 14%;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(2):hover {
+    height: 30%;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(3)  {
+    background-image: url("../recursos/22.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    outline: 1px solid #970013;
+    width: 100%;
+    height: 14%;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(3):hover {
+    height: 30%;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(4) {
+    background-image: url("../recursos/4.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    outline: 1px solid #970013;
+    width: 100%;
+    height: 14%;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(4):hover {
+    height: 30%;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(5) {
+    background-image: url("../recursos/5.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    outline: 1px solid #970013;
+    width: 100%;
+    height: 14%;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(5):hover {
+    height: 30%;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(6) {
+    background-image: url("../recursos/6.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: white;
+    outline: 1px solid #970013;
+    width: 100%;
+    height: 14%;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-propuesta .row .informacionNosotros div:nth-child(6):hover {
+    height: 30%;
+}
+/* Seccion Ubicacion */
+.seccion-ubi {
+    background-color:  #970013;
+    padding: 10px 0;
+}
+.seccion-ubi div {
+    height: 500px;
+    background-image: url("../recursos/ubi.jpeg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+/* Seccion Videos */
+.seccion-historia-videos{
+    height: auto;
+    padding: 20px;
+    background-color: #3E327E;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+}
+.historia-videos {
+    width: auto;
+    height: 300px;
+    background-color: rgba(128, 128, 128, 0.5);
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    flex-grow: 1;
+}
