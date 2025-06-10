@@ -7,12 +7,15 @@ import com.gamma.backend.model.Alumno;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AlumnoRepository;
 import com.gamma.backend.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AlumnoController {
+    private static final Logger logger = LoggerFactory.getLogger(AlumnoController.class);
 
     @Autowired
     private AlumnoRepository alumnoRepository;
@@ -29,6 +32,7 @@ public class AlumnoController {
                 alumno.setClave(alumno.getUser().getClave());
             }
         }
+        logger.info("Listado de alumnos solicitado.");
         return ResponseEntity.ok(alumnos);
     }
 
@@ -60,8 +64,10 @@ public class AlumnoController {
             }
 
             Alumno AlumnoActualizado = alumnoRepository.save(AlumnoExistente);
+            logger.info("Alumno con DNI {} actualizado.", Alumno.getDni());
             return ResponseEntity.ok(AlumnoActualizado);
         } else {
+            logger.warn("Intento de actualizar alumno con DNI {} que no existe.", Alumno.getDni());
             return ResponseEntity.notFound().build();
         }
     }
@@ -97,6 +103,7 @@ public class AlumnoController {
         Alumno.setNivel(nivel);
         Alumno.setGrado(grado);
         alumnoRepository.save(Alumno);
+        logger.info("Alumno con DNI {} agregado.", dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Alumno agregado con éxito"));
     }
@@ -118,8 +125,10 @@ public class AlumnoController {
                 userRepository.deleteById(user.getDni());
             }
 
+            logger.info("Alumno con DNI {} eliminado.", dni);
             return ResponseEntity.ok(Map.of("mensaje", "Alumno eliminado con éxito"));
         } else {
+            logger.warn("Intento de eliminar alumno con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }
@@ -143,9 +152,11 @@ public class AlumnoController {
 
                 return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada con éxito"));
             } else {
+                logger.warn("Intento de actualizar contraseña del alumno con DNI {} que no existe.", dni);
                 return ResponseEntity.notFound().build();
             }
         } else {
+            logger.warn("Intento de actualizar contraseña del alumno con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }

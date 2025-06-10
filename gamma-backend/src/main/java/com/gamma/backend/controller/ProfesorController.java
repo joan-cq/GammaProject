@@ -4,6 +4,8 @@ import com.gamma.backend.model.Profesor;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.ProfesorRepository;
 import com.gamma.backend.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import com.gamma.backend.model.Curso;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @RestController
 public class ProfesorController {
+    private static final Logger logger = LoggerFactory.getLogger(ProfesorController.class);
 
     @Autowired
     private ProfesorRepository profesorRepository;
@@ -35,6 +38,7 @@ public class ProfesorController {
                 profesor.setClave(profesor.getUser().getClave());
             }
         }
+        logger.info("Listado de profesores solicitado.");
         return ResponseEntity.ok(profesores);
     }
 
@@ -67,8 +71,10 @@ public class ProfesorController {
             }
 
             Profesor profesorActualizado = profesorRepository.save(profesorExistente);
+            logger.info("Profesor con DNI {} actualizado.", dni);
             return ResponseEntity.ok(profesorActualizado);
         } else {
+            logger.warn("Intento de actualizar profesor con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }
@@ -101,6 +107,7 @@ public class ProfesorController {
         profesor.setCelular(celular);
         profesor.setEstado(estado);
         profesorRepository.save(profesor);
+        logger.info("Profesor con DNI {} agregado.", dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Profesor agregado con éxito"));
     }
@@ -122,8 +129,10 @@ public class ProfesorController {
                 userRepository.deleteById(user.getDni());
             }
 
+            logger.info("Profesor con DNI {} eliminado.", dni);
             return ResponseEntity.ok(Map.of("mensaje", "Profesor eliminado con éxito"));
         } else {
+            logger.warn("Intento de eliminar profesor con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }
@@ -147,9 +156,11 @@ public class ProfesorController {
 
                 return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada con éxito"));
             } else {
+                logger.warn("Intento de actualizar contraseña del profesor con DNI {} que no existe.", dni);
                 return ResponseEntity.notFound().build();
             }
         } else {
+            logger.warn("Intento de actualizar contraseña del profesor con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }

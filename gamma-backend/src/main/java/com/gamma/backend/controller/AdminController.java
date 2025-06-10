@@ -4,6 +4,8 @@ import com.gamma.backend.model.Administrador;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AdministradorRepository;
 import com.gamma.backend.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.util.Map;
 
 @RestController
 public class AdminController {
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     @Autowired
     private AdministradorRepository administradorRepository;
@@ -29,6 +32,7 @@ public class AdminController {
                 administrador.setClave(administrador.getUser().getClave());
             }
         }
+        logger.info("Listado de administradores solicitado.");
         return ResponseEntity.ok(administradores);
     }
 
@@ -57,8 +61,10 @@ public class AdminController {
             }
 
             Administrador administradorActualizado = administradorRepository.save(administradorExistente);
+            logger.info("Administrador con DNI {} actualizado.", administrador.getDni());
             return ResponseEntity.ok(administradorActualizado);
         } else {
+            logger.warn("Intento de actualizar administrador con DNI {} que no existe.", administrador.getDni());
             return ResponseEntity.notFound().build();
         }
     }
@@ -88,6 +94,7 @@ public class AdminController {
         administrador.setCelular(celular);
         administrador.setEstado(estado);
         administradorRepository.save(administrador);
+        logger.info("Administrador con DNI {} agregado.", dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Administrador agregado con éxito"));
     }
@@ -109,8 +116,10 @@ public class AdminController {
                 userRepository.deleteById(user.getDni());
             }
 
+            logger.info("Administrador con DNI {} eliminado.", dni);
             return ResponseEntity.ok(Map.of("mensaje", "Administrador eliminado con éxito"));
         } else {
+            logger.warn("Intento de eliminar administrador con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }
@@ -131,12 +140,15 @@ public class AdminController {
                 // Actualizar la contraseña del usuario
                 user.setClave(nuevaClave);
                 userRepository.save(user);
+                logger.info("Contraseña del administrador con DNI {} actualizada.", dni);
 
                 return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada con éxito"));
             } else {
+                logger.warn("Intento de actualizar contraseña del administrador con DNI {} que no existe.", dni);
                 return ResponseEntity.notFound().build();
             }
         } else {
+            logger.warn("Intento de actualizar contraseña del administrador con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }
