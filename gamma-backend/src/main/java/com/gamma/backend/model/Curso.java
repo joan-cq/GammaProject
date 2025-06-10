@@ -19,7 +19,7 @@ public class Curso {
     @Column(name = "nivel")
     private String nivel;  // PRIMARIA o SECUNDARIA
 
-    // Relación inversa si querés listar profesores por curso
+    // Relación inversa 
     @OneToMany(mappedBy = "curso")
     private List<Profesor> profesores;
 }
