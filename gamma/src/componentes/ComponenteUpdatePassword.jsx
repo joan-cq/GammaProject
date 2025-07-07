@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 
-function ComponenteUpdatePassword({ fetchListarUsuarios, dni, onClose, tipoUsuario }) {
+function ComponenteUpdatePassword({ fetchListarUsuarios, dni,nombre, apellido, onClose, tipoUsuario }) {
   const [nuevaClave, setNuevaClave] = useState('');
   const [confirmarClave, setConfirmarClave] = useState('');
   const [mostrarNuevaClave, setMostrarNuevaClave] = useState(false);
@@ -56,7 +56,7 @@ function ComponenteUpdatePassword({ fetchListarUsuarios, dni, onClose, tipoUsuar
 
   return (
     <div className='container contenedorTabla' style={{ margin: '20px auto', maxWidth: '600px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-      <h3>Actualizar Contraseña</h3>
+      <h3>Actualizar Contraseña: {nombre} {apellido}</h3>
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">

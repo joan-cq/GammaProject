@@ -3,6 +3,7 @@ import "../estilos/notas.css";
 
 function ComponenteNotas () {
     const [alumnoDNI, setAlumnoDNI] = useState('');
+    const [alumnoPassword, setAlumnoPassword] = useState('');
     const [alumnoNombre, setAlumnoNombre] = useState(false);
     const [alumnoDatos, setAlumnoDatos] = useState([]);
     const [mostrarSeccion, setMostrarSeccion] = useState(false);
@@ -33,12 +34,13 @@ function ComponenteNotas () {
     console.log(alumnoDatos);
     return (
         <>
-            <section className="container login">
+            <section className="container login loginAdmin">
                 <div className="login-form">
                     {alumnoNombre ? alumnoDatos.map((nombre) => <h3 key={nombre.DNI}> {nombre.Nombre} </h3>) : "Ingrese DNI"}
                     <img src={require("../recursos/insignia.jpg")} alt="Logo" />
                     <form action="./login.html" method="POST">
-                        <input value={alumnoDNI} onChange={(e) => setAlumnoDNI(e.target.value)} type="number" name="alumnoDNI" placeholder="DNI del Alumno:" required={true} id="alumnoDNI" />
+                        <input value={alumnoDNI} onChange={(e) => setAlumnoDNI(e.target.value)} type="text" name="alumnoDNI" placeholder="DNI del Alumno:" required={true} id="alumnoDNI" />                       
+                        <input value={alumnoPassword} onChange={(e) => setAlumnoPassword(e.target.value)} type="password" name="alumnoPassword" placeholder="Contraseña del Alumno:" required={true} id="alumnoPassword" />
                         <input onClick={buscarDatosPorDNI} type="button" value="Buscar" id="submit" />
                     </form>
                 </div>

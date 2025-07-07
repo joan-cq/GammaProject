@@ -321,6 +321,8 @@ function ComponenteProfesores() {
                     profesor={selectedProfesor}
                     fetchListarUsuarios={fetchListarProfesor}
                     dni={selectedProfesor ? selectedProfesor.dni : null}
+                    nombre={selectedProfesor ? selectedProfesor.nombre : null}
+                    apellido={selectedProfesor ? selectedProfesor.apellido : null}
                     tipoUsuario="profesor"
                   />
                 )}

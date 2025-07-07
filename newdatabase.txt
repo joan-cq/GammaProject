@@ -1,0 +1,99 @@
+-- Tabla de usuarios
+CREATE TABLE usuario (
+    dni VARCHAR(8) PRIMARY KEY,
+    clave VARCHAR(255) NOT NULL,
+    rol ENUM('ADMINISTRADOR', 'PROFESOR', 'ALUMNO') NOT NULL
+);
+
+-- Tabla de grados
+CREATE TABLE grado (
+    codigo_grado VARCHAR(10) PRIMARY KEY, -- Ej: '1PRI', '2PRI', '3SEC'
+    nombre_grado VARCHAR(20) NOT NULL,    -- Ej: '1', '2', '3'
+    nivel ENUM('PRIMARIA', 'SECUNDARIA') NOT NULL
+);
+
+-- Tabla de cursos
+CREATE TABLE curso (
+    codigo_curso VARCHAR(10) PRIMARY KEY, -- Ej: 'MAT', 'COM', 'REL'
+    nombre VARCHAR(100) NOT NULL,
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO'
+);
+
+-- Tabla de relación grado-curso (editable)
+CREATE TABLE grado_curso (
+    codigo_grado VARCHAR(10),
+    codigo_curso VARCHAR(10),
+    PRIMARY KEY (codigo_grado, codigo_curso),
+    FOREIGN KEY (codigo_grado) REFERENCES grado(codigo_grado) ON DELETE CASCADE,
+    FOREIGN KEY (codigo_curso) REFERENCES curso(codigo_curso) ON DELETE CASCADE
+);
+
+-- Tabla de años escolares
+CREATE TABLE anio_escolar (
+    id_anio INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    anio INT NOT NULL UNIQUE,
+    activo BOOLEAN DEFAULT FALSE
+);
+
+-- Tabla de bimestres
+CREATE TABLE bimestre (
+    id_bimestre INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_anio INT UNSIGNED NOT NULL,
+    nombre ENUM('PRIMER BIMESTRE', 'SEGUNDO BIMESTRE', 'TERCER BIMESTRE', 'CUARTO BIMESTRE') NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    FOREIGN KEY (id_anio) REFERENCES anio_escolar(id_anio) ON DELETE CASCADE
+);
+
+-- Tabla de alumnos
+CREATE TABLE alumno (
+    dni VARCHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    celular_apoderado VARCHAR(15),
+    genero ENUM('MASCULINO', 'FEMENINO'),
+    codigo_grado VARCHAR(10), -- FK al grado legible
+    id_anio INT UNSIGNED NOT NULL,
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (dni) REFERENCES usuario(dni) ON DELETE CASCADE,
+    FOREIGN KEY (codigo_grado) REFERENCES grado(codigo_grado) ON DELETE SET NULL,
+    FOREIGN KEY (id_anio) REFERENCES anio_escolar(id_anio) ON DELETE CASCADE
+);
+
+-- Tabla de administradores
+CREATE TABLE administrador (
+    dni VARCHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    celular VARCHAR(15),
+    id_anio INT UNSIGNED NOT NULL,
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (dni) REFERENCES usuario(dni) ON DELETE CASCADE,
+    FOREIGN KEY (id_anio) REFERENCES anio_escolar(id_anio) ON DELETE CASCADE
+);
+
+-- Tabla de profesores
+CREATE TABLE profesor (
+    dni VARCHAR(8) PRIMARY KEY,
+    nombre VARCHAR(100),
+    apellido VARCHAR(100),
+    celular VARCHAR(15),
+    codigo_curso VARCHAR(10),
+    id_anio INT UNSIGNED NOT NULL,
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+    FOREIGN KEY (dni) REFERENCES usuario(dni) ON DELETE CASCADE,
+    FOREIGN KEY (codigo_curso) REFERENCES curso(codigo_curso) ON DELETE SET NULL,
+    FOREIGN KEY (id_anio) REFERENCES anio_escolar(id_anio) ON DELETE CASCADE
+);
+
+-- Tabla de notas
+CREATE TABLE nota (
+    id_nota INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    dni_alumno VARCHAR(8) NOT NULL,
+    codigo_curso VARCHAR(10) NOT NULL,
+    id_bimestre INT UNSIGNED NOT NULL,
+    nota DECIMAL(4,2),
+    FOREIGN KEY (dni_alumno) REFERENCES alumno(dni) ON DELETE CASCADE,
+    FOREIGN KEY (codigo_curso) REFERENCES curso(codigo_curso) ON DELETE CASCADE,
+    FOREIGN KEY (id_bimestre) REFERENCES bimestre(id_bimestre) ON DELETE CASCADE
+);
