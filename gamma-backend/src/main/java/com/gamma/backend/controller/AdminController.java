@@ -1,9 +1,12 @@
 package com.gamma.backend.controller;
 
 import com.gamma.backend.model.Administrador;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AdministradorRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.otherservice.AnioEscolarService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +26,27 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AnioEscolarService anioEscolarService;
+
     @GetMapping("/admin/list")
     public ResponseEntity<List<Administrador>> listarAdministradores() {
-        List<Administrador> administradores = administradorRepository.findAll();
+        List<AnioEscolar> aniosActivos = anioEscolarService.obtenerAniosActivos();
+
+        if (aniosActivos.isEmpty()) {
+            logger.warn("No hay años escolares activos al listar administradores.");
+            return ResponseEntity.ok(List.of()); // Lista vacía
+        }
+
+        List<Administrador> administradores = administradorRepository.findByAnioEscolarIn(aniosActivos);
+
         for (Administrador administrador : administradores) {
             if (administrador.getUser() != null) {
                 administrador.setRol(administrador.getUser().getRol());
                 administrador.setClave(administrador.getUser().getClave());
             }
         }
+
         logger.info("Listado de administradores solicitado.");
         return ResponseEntity.ok(administradores);
     }
@@ -71,6 +86,7 @@ public class AdminController {
 
     @PostMapping("/admin/add")
     public ResponseEntity<?> agregarAdministrador(@RequestBody Map<String, String> payload) {
+
         String dni = payload.get("dni");
         String nombre = payload.get("nombre");
         String apellido = payload.get("apellido");
@@ -92,6 +108,11 @@ public class AdminController {
         administrador.setNombre(nombre);
         administrador.setApellido(apellido);
         administrador.setCelular(celular);
+
+        AnioEscolar anioEscolar = anioEscolarService.obtenerAnioActivo()
+        .orElseThrow(() -> new RuntimeException("No hay año escolar activo"));
+
+        administrador.setAnioEscolar(anioEscolar);
         administrador.setEstado(estado);
         administradorRepository.save(administrador);
         logger.info("Administrador con DNI {} agregado.", dni);

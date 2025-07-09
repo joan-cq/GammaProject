@@ -17,7 +17,7 @@ public class Profesor {
     private String dni;
 
     @OneToOne
-    @JoinColumn(name = "dni", referencedColumnName = "dni")
+    @JoinColumn(name = "dni", referencedColumnName = "dni", insertable = false, updatable = false)
     private User user;
 
     @Column(name = "nombre")
@@ -34,6 +34,10 @@ public class Profesor {
     @JsonBackReference
     private Curso curso;
 
+    @ManyToOne
+    @JoinColumn(name = "id_anio")
+    private AnioEscolar anioEscolar;
+
     @Column(name = "estado")
     private String estado;
 
@@ -48,6 +52,7 @@ public class Profesor {
     public String getCodigoCurso() {
         return this.curso.getCodigoCurso();
     }
+
     public void setRol(String rol) {
         this.user.setRol(rol);
     }

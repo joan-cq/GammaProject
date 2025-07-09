@@ -17,8 +17,11 @@ public class AlumnoAuthStrategy implements RoleAuthStrategy {
     }
 
     @Override
-    public boolean estaActivo(String dni) {
+    public boolean estaActivo(String dni, Long anioActivo) {
         Alumno alumno = alumnoRepository.findByDni(dni);
-        return alumno != null && "ACTIVO".equalsIgnoreCase(alumno.getEstado());
+        return alumno != null &&
+            "ACTIVO".equalsIgnoreCase(alumno.getEstado()) &&
+            alumno.getAnioEscolar() != null &&
+            alumno.getAnioEscolar().getId().equals(anioActivo);
     }
 }

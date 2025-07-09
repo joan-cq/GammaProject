@@ -1,7 +1,9 @@
 package com.gamma.backend.service.auth;
 
 import com.gamma.backend.model.User;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.otherservice.AnioEscolarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +16,16 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final Map<String, RoleAuthStrategy> estrategias;
+    private final AnioEscolarService anioEscolarService;
 
     @Autowired
-    public LoginService(UserRepository userRepository, List<RoleAuthStrategy> strategyList) {
+    public LoginService(UserRepository userRepository,
+                        List<RoleAuthStrategy> strategyList,
+                        AnioEscolarService anioEscolarService) {
         this.userRepository = userRepository;
-
-        // Mapeo cada estrategia según su rol, ej: "ADMINISTRADOR" -> AdminAuthStrategy
         this.estrategias = strategyList.stream()
                 .collect(Collectors.toMap(RoleAuthStrategy::getRol, e -> e));
+        this.anioEscolarService = anioEscolarService;
     }
 
     public String autenticar(String dni, String clave) {
@@ -39,7 +43,14 @@ public class LoginService {
             return "ROL_DESCONOCIDO";
         }
 
-        boolean activo = strategy.estaActivo(dni);
-        return activo ? usuario.getRol() : "INACTIVO";
+        List<AnioEscolar> aniosActivos = anioEscolarService.obtenerAniosActivos();
+        if (aniosActivos.isEmpty()) {
+            return "NO_AÑOS_ACTIVOS";
+        }
+
+        boolean perteneceAAlguno = aniosActivos.stream()
+                .anyMatch(anio -> strategy.estaActivo(dni, anio.getId()));
+
+        return perteneceAAlguno ? usuario.getRol() : "AÑO_INACTIVO";
     }
 }

@@ -19,15 +19,17 @@ function ComponenteAdministradores() {
     const [error, setError] = useState('');
 
     const fetchListarAdministrador = async () => {
-        try {
-            const apiURL = await fetch("http://localhost:8080/admin/list");
-            if (!apiURL.ok) {
-                console.log("LA API ADMIN NO EXISTE");
-            }
-            const data = await apiURL.json();
-            setAdministradorUsuario(data);
-        } catch (error) {
-            console.log(error);
+    try {
+        const res = await axios.get("http://localhost:8080/admin/list");
+        if (Array.isArray(res.data)) {
+            setAdministradorUsuario(res.data);
+        } else {
+            console.error("Respuesta inesperada del backend:", res.data);
+            setAdministradorUsuario([]);
+        }
+    }   catch (error) {
+            console.error("Error al obtener administradores:", error);
+            setAdministradorUsuario([]);
         }
     }
 
@@ -236,8 +238,8 @@ function ComponenteAdministradores() {
                                 <td>
                                     <select value={estado} onChange={(e) => setEstado(e.target.value)} placeholder="Estado">
                                         <option value="">Seleccionar Estado</option>
-                                        <option value="activo">ACTIVO</option>
-                                        <option value="inactivo">INACTIVO</option>
+                                        <option value="ACTIVO">ACTIVO</option>
+                                        <option value="INACTIVO">INACTIVO</option>
                                     </select>
                                 </td>
                             </tr>
@@ -275,7 +277,8 @@ function ComponenteAdministradores() {
                             </tr>
                         </thead>
                         <tbody>
-                                {AdministradorUsuario.map((Administrador) => (
+                                {Array.isArray(AdministradorUsuario) ? (
+                                    AdministradorUsuario.map((Administrador) => (
                                     <tr className="table-primary" key={Administrador.dni}>
                                         <td>{Administrador.dni}</td>
                                         <td>{Administrador.nombre}</td>
@@ -283,8 +286,8 @@ function ComponenteAdministradores() {
                                         <td>{Administrador.celular}</td>
                                         <td>{Administrador.user.rol}</td>
                                         <td>********</td>
-                                        <td style={{ color: Administrador.estado === 'activo' ? 'green' : 'red' }}>
-                                           {Administrador.estado === 'activo' ? "🟢" : "🔴"}
+                                        <td style={{ color: Administrador.estado === 'ACTIVO' ? 'green' : 'red' }}>
+                                           {Administrador.estado === 'ACTIVO' ? "🟢" : "🔴"}
                                         </td>
                                         <td>
                                             <div className="btn-group" role="group" aria-label="Basic mixed styles example">
@@ -294,7 +297,12 @@ function ComponenteAdministradores() {
                                                 </div>
                                            </td>
                                        </tr>
-                                    ))}
+                                    ))
+                                ) : (
+                                    <tr>
+                                    <td colSpan={8}>No se pudo cargar la lista de administradores.</td>
+                                    </tr>
+                                )}
                         </tbody>
                     </table>
                 </section>
@@ -306,6 +314,8 @@ function ComponenteAdministradores() {
                     administrador={selectedAdministrador}
                     fetchListarUsuarios={fetchListarAdministrador}
                     dni={selectedAdministrador ? selectedAdministrador.dni : null}
+                    nombre={selectedAdministrador ? selectedAdministrador.nombre : null}
+                    apellido={selectedAdministrador ? selectedAdministrador.apellido : null}
                     tipoUsuario="admin"
                   />
                 )}

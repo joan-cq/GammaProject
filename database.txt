@@ -9,7 +9,7 @@ CREATE TABLE usuario (
 CREATE TABLE anio_escolar (
     id_anio INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     anio INT NOT NULL UNIQUE,
-    activo BOOLEAN DEFAULT FALSE
+    estado ENUM('ACTIVO', 'INACTIVO') DEFAULT 'INACTIVO'
 );
 
 -- Tabla de grados

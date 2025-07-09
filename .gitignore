@@ -13,3 +13,8 @@ Thumbs.db
 # Archivos temporales
 *.tmp
 *.swp
+
+#ARCHIVOS DE GUIA
+database.txt
+variables.txt
+instructions.txt

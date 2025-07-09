@@ -1,5 +1,6 @@
 package com.gamma.backend.service.auth;
 
+import com.gamma.backend.model.Alumno;
 import com.gamma.backend.model.Profesor;
 import com.gamma.backend.repository.ProfesorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,11 @@ public class ProfesorAuthStrategy implements RoleAuthStrategy {
     }
 
     @Override
-    public boolean estaActivo(String dni) {
+    public boolean estaActivo(String dni, Long anioActivo) {
         Profesor profesor = profesorRepository.findByDni(dni);
-        return profesor != null && "ACTIVO".equalsIgnoreCase(profesor.getEstado());
+        return profesor != null &&
+            "ACTIVO".equalsIgnoreCase(profesor.getEstado()) &&
+            profesor.getAnioEscolar() != null &&
+            profesor.getAnioEscolar().getId().equals(anioActivo);
     }
 }

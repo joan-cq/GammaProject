@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-//@RequestMapping("/auth")
-//@CrossOrigin(origins = "*")
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -33,19 +31,27 @@ public class AuthController {
                 response = ResponseEntity.ok(Map.of("rol", resultado, "mensaje", "Login exitoso"));
                 break;
             case "CLAVE_INCORRECTA":
-                logger.warn("Intento de inicio de sesión fallido para el usuario con DNI: {} - Contraseña incorrecta", dni);
+                logger.warn("Contraseña incorrecta para el usuario con DNI: {}", dni);
                 response = ResponseEntity.status(401).body(Map.of("error", "Contraseña incorrecta"));
                 break;
             case "INACTIVO":
-                logger.warn("Intento de inicio de sesión fallido para el usuario con DNI: {} - Usuario inactivo", dni);
+                logger.warn("Usuario inactivo con DNI: {}", dni);
                 response = ResponseEntity.status(403).body(Map.of("error", "Usuario inactivo"));
                 break;
+            case "ANIO_INACTIVO":
+                logger.warn("Usuario con DNI: {} no pertenece al año escolar activo", dni);
+                response = ResponseEntity.status(403).body(Map.of("error", "Usuario no pertenece al año activo"));
+                break;
+            case "NO_ANIOS_ACTIVOS":
+                logger.error("No hay año escolar activo en el sistema al intentar login de DNI: {}", dni);
+                response = ResponseEntity.status(503).body(Map.of("error", "No hay año escolar activo"));
+                break;
             case "ROL_DESCONOCIDO":
-                logger.error("Intento de inicio de sesión fallido para el usuario con DNI: {} - Rol desconocido", dni);
+                logger.error("Rol desconocido para el usuario con DNI: {}", dni);
                 response = ResponseEntity.status(403).body(Map.of("error", "Rol no reconocido"));
                 break;
             case "NO_EXISTE":
-                logger.warn("Intento de inicio de sesión fallido para el usuario con DNI: {} - Usuario no encontrado", dni);
+                logger.warn("Usuario no encontrado con DNI: {}", dni);
                 response = ResponseEntity.status(404).body(Map.of("error", "Usuario no encontrado"));
                 break;
             default:

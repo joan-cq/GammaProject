@@ -16,7 +16,7 @@ public class Alumno {
     private String dni;
 
     @OneToOne
-    @JoinColumn(name = "dni", referencedColumnName = "dni")
+    @JoinColumn(name = "dni", referencedColumnName = "dni", insertable = false, updatable = false)
     private User user;
 
     @Column(name = "nombre")
@@ -36,6 +36,10 @@ public class Alumno {
 
     @Column(name = "nivel")
     private String nivel;
+
+    @ManyToOne
+    @JoinColumn(name = "id_anio")
+    private AnioEscolar anioEscolar;
 
     @Column(name = "estado")
     private String estado;
