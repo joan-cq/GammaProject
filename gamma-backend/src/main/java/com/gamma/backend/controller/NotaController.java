@@ -6,6 +6,7 @@ import com.gamma.backend.model.Bimestre;
 import com.gamma.backend.repository.AlumnoRepository;
 import com.gamma.backend.repository.NotaRepository;
 import com.gamma.backend.repository.BimestreRepository;
+import com.gamma.backend.repository.CursoRepository;
 import com.gamma.backend.service.modelservice.NotaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,9 @@ public class NotaController {
 
     @Autowired
     private NotaService notaService;
+
+    @Autowired
+    private CursoRepository cursoRepository;
 
     @GetMapping("/notas/alumnos")
     public ResponseEntity<?> obtenerAlumnosPorGradoBimestreCurso(
@@ -76,7 +80,7 @@ public class NotaController {
         Nota nota = new Nota();
         Alumno alumno = alumnoRepository.findByDni(dniAlumno);
         nota.setAlumno(alumno);
-        //nota.setCurso(cursoRepository.findById(codigoCurso).orElse(null));
+        nota.setCurso(cursoRepository.findById(codigoCurso).orElse(null));
         Bimestre bimestre = bimestreRepository.findById(Long.valueOf(idBimestre)).orElse(null);
         nota.setBimestre(bimestre);
         nota.setNota(notaValue.doubleValue());
