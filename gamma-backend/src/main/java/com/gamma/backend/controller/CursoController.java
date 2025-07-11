@@ -1,6 +1,7 @@
 package com.gamma.backend.controller;
 
 import com.gamma.backend.model.Curso;
+import com.gamma.backend.model.Estado;
 import com.gamma.backend.repository.CursoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,41 +23,33 @@ public class CursoController {
     }
 
     @PostMapping("/curso/add")
-    public ResponseEntity<?> agregarCurso(@RequestBody Map<String, String> payload) {
-        String codigoCurso = payload.get("codigoCurso");
-        String nombre = payload.get("nombre");
-
-        Curso curso = new Curso();
-        curso.setCodigoCurso(codigoCurso);
-        curso.setNombre(nombre);
-        curso.setEstado("");
-
+    public ResponseEntity<?> agregarCurso(@RequestBody Curso curso) {
+        curso.setEstado(Estado.ACTIVO);
         cursoRepository.save(curso);
-
         return ResponseEntity.ok(Map.of("mensaje", "Curso agregado con éxito"));
     }
 
-    @PutMapping("/curso/update")
-    public ResponseEntity<Curso> actualizarCurso(@RequestBody Curso curso) {
-        Curso cursoExistente = cursoRepository.findById(curso.getCodigoCurso()).orElse(null);
-
-        if (cursoExistente != null) {
-            cursoExistente.setEstado("ACTIVO");
-
-            Curso cursoActualizado = cursoRepository.save(cursoExistente);
-            return ResponseEntity.ok(cursoActualizado);
-        } else {
+    @PutMapping("/curso/update/{codigoCurso}")
+    public ResponseEntity<?> actualizarCurso(@PathVariable String codigoCurso, @RequestBody Curso cursoDetails) {
+        Curso cursoExistente = cursoRepository.findById(codigoCurso).orElse(null);
+        if (cursoExistente == null) {
             return ResponseEntity.notFound().build();
         }
+        cursoExistente.setNombre(cursoDetails.getNombre());
+        cursoExistente.setEstado(cursoDetails.getEstado());
+        cursoRepository.save(cursoExistente);
+        return ResponseEntity.ok(Map.of("mensaje", "Curso actualizado con éxito"));
     }
 
-    @DeleteMapping("/curso/delete/{codigoCurso}")
-    public ResponseEntity<?> eliminarCurso(@PathVariable String codigoCurso) {
-        if (cursoRepository.existsById(codigoCurso)) {
-            cursoRepository.deleteById(codigoCurso);
-            return ResponseEntity.ok(Map.of("mensaje", "Curso eliminado con éxito"));
-        } else {
+    @PutMapping("/curso/toggle/{codigoCurso}")
+    public ResponseEntity<?> toggleCurso(@PathVariable String codigoCurso) {
+        Curso cursoExistente = cursoRepository.findById(codigoCurso).orElse(null);
+        if (cursoExistente == null) {
             return ResponseEntity.notFound().build();
         }
+        Estado nuevoEstado = cursoExistente.getEstado() == Estado.ACTIVO ? Estado.INACTIVO : Estado.ACTIVO;
+        cursoExistente.setEstado(nuevoEstado);
+        cursoRepository.save(cursoExistente);
+        return ResponseEntity.ok(Map.of("mensaje", "Estado del curso actualizado con éxito"));
     }
 }

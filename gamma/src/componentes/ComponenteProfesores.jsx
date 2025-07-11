@@ -298,8 +298,8 @@ function ComponenteProfesores() {
                                         <td>{Profesor.codigoCurso}</td>
                                         <td>{Profesor.rol}</td>
                                         <td>{"********"}</td>
-                                        <td style={{ color: Profesor.estado === 'activo' ? 'green' : 'red' }}>
-                                           {Profesor.estado === 'activo' ? "🟢" : "🔴"}
+                                        <td style={{ color: Profesor.estado === 'ACTIVO' ? 'green' : 'red' }}>
+                                           {Profesor.estado === 'ACTIVO' ? "🟢" : "🔴"}
                                         </td>
                                         <td>
                                             <div className="btn-group" role="group" aria-label="Basic mixed styles example">

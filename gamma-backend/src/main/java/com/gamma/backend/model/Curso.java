@@ -18,6 +18,7 @@ public class Curso {
     @Column(nullable = false)
     private String nombre;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String estado;
+    private Estado estado;
 }

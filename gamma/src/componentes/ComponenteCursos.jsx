@@ -1,171 +1,132 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Swal from 'sweetalert2';
-import {ComponentePanelAdmin} from "./index.js"
+import { Modal, Button, Form } from 'react-bootstrap';
+import { ComponentePanelAdmin } from './index';
 
 function ComponenteCursos() {
     const [cursos, setCursos] = useState([]);
-    const [codigoCurso, setCodigoCurso] = useState("");
-    const [nivelCurso, setNivelCurso] = useState("");
-    const [editar, setEditar] = useState(false);
+    const [modalShow, setModalShow] = useState(false);
+    const [cursoActual, setCursoActual] = useState({ codigoCurso: '', nombre: '', estado: 'ACTIVO' });
+    const [esNuevo, setEsNuevo] = useState(true);
 
-    const fetchListarCursos = async () => {
-        try {
-            const apiURL = await fetch("http://localhost:8080/curso/list");
-            if (!apiURL.ok) {
-                console.log("LA API CURSO NO EXISTE");
-            }
-            const data = await apiURL.json();
-            setCursos(data);
-        } catch (error) {
-            console.log(error);
-        }
-    }
-    const agregarCurso = () => {
-        axios.post("http://localhost:8080/curso/add", {
-            codigoCurso: codigoCurso,
-            nivel: nivelCurso,
-        }).then(() => {
-            fetchListarCursos();
-            setCodigoCurso("");
-            setNivelCurso("");
-            Swal.fire({
-                title: '¡Enhorabuena!',
-                text: '¡Curso agregado con éxito!',
-                icon: 'success',
-            });
-        })
-    };
-    const eliminarCurso = (codigoCurso) => {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-        swalWithBootstrapButtons.fire({
-            title: "¿Estas seguro?",
-            text: "¡No podrás revertir el cambio!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "¡Si, eliminar!",
-            cancelButtonText: "¡No, cancelar!",
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                axios.delete(`http://localhost:8080/curso/delete/${codigoCurso}`)
-                .then(() => {
-                    fetchListarCursos();
-                });
-                swalWithBootstrapButtons.fire({
-                title: "¡Enhorabuena!",
-                text: "¡Curso eliminado con éxito!",
-                icon: "success"
-        }); } else if (
-            result.dismiss === Swal.DismissReason.cancel
-            ) {
-            swalWithBootstrapButtons.fire({
-                title: "¡Enhorabuena!",
-                text: "¡Curso no fue eliminado!",
-                icon: "success"
-            });
-            }
-        });
-    }
-    const editarCurso = (curso) => {
-        setEditar(true);
-        setCodigoCurso(curso.codigoCurso);
-        setNivelCurso(curso.nivel);
-    }
-    const actualizarCurso = () => {
-        axios.put("http://localhost:8080/curso/update", {
-            codigoCurso: codigoCurso,
-            nivel: nivelCurso,
-        }).then(() => {
-            setEditar(false);
-            fetchListarCursos();
-            setCodigoCurso("");
-            setNivelCurso("");
-            Swal.fire({
-                title: '¡Enhorabuena!',
-                text: '¡Curso actualizado con éxito!',
-                icon: 'success',
-            });
-        }).catch((error) => {
-            console.error("Error al actualizar el cursos:", error);
-        });
-    }
-    
     useEffect(() => {
-        fetchListarCursos();
-    }, [])
+        cargarCursos();
+    }, []);
+
+    const cargarCursos = async () => {
+        try {
+            const res = await axios.get('http://localhost:8080/curso/list');
+            setCursos(res.data);
+        } catch (error) {
+            console.error("Error cargando cursos:", error);
+        }
+    };
+
+    const abrirModal = (curso) => {
+        if (curso) {
+            setCursoActual(curso);
+            setEsNuevo(false);
+        } else {
+            setCursoActual({ codigoCurso: '', nombre: '', estado: 'ACTIVO' });
+            setEsNuevo(true);
+        }
+        setModalShow(true);
+    };
+
+    const cerrarModal = () => {
+        setModalShow(false);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setCursoActual({ ...cursoActual, [name]: value });
+    };
+
+    const guardarCurso = async () => {
+        try {
+            if (esNuevo) {
+                await axios.post('http://localhost:8080/curso/add', cursoActual);
+                Swal.fire('¡Curso agregado!', '', 'success');
+            } else {
+                await axios.put(`http://localhost:8080/curso/update/${cursoActual.codigoCurso}`, cursoActual);
+                Swal.fire('¡Curso actualizado!', '', 'success');
+            }
+            cerrarModal();
+            cargarCursos();
+        } catch (error) {
+            console.error("Error guardando curso:", error);
+            Swal.fire('Error', 'No se pudo guardar el curso', 'error');
+        }
+    };
+
+    const toggleEstado = async (codigoCurso) => {
+        try {
+            await axios.put(`http://localhost:8080/curso/toggle/${codigoCurso}`);
+            Swal.fire('¡Estado actualizado!', '', 'success');
+            cargarCursos();
+        } catch (error) {
+            console.error("Error actualizando estado:", error);
+            Swal.fire('Error', 'No se pudo actualizar el estado', 'error');
+        }
+    };
 
     return (
-        <>
+        <div>
             <ComponentePanelAdmin />
-            <div className='container contenedorTabla'>
-                <h3> Lista Cursos: </h3>
-                <section className="contenedorAddAlumno">
-                    <table className="table table-dark">
-                        <thead>
-                            <tr>
-                                <th scope="col"> Código </th>
-                                <th scope="col"> Nivel </th>
-                                <th scope="col">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr className="table-success">
+            <div className="container">
+                <h3>Gestión de Cursos</h3>
+                <button className="btn btn-primary mb-3" onClick={() => abrirModal(null)}>Agregar Curso</button>
+                <table className="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {cursos.map(curso => (
+                            <tr key={curso.codigoCurso}>
+                                <td>{curso.codigoCurso}</td>
+                                <td>{curso.nombre}</td>
+                                <td>{curso.estado}</td>
                                 <td>
-                                    <input type="text" value={codigoCurso} onChange={(e) => setCodigoCurso(e.target.value)}/>
-                                </td>
-                                <td>
-                                    <input type="text" value={nivelCurso} onChange={(e) => setNivelCurso(e.target.value)}/>
-                                </td>
-                                <td>
-                                    <div role="group" aria-label="Basic mixed styles example">
-                                        {
-                                            editar === true ?
-                                            <button onClick={actualizarCurso} className="btn btn-warning"> Actualizar </button> :
-                                            <button onClick={agregarCurso} className="btn btn-success"> Agregar </button>
-                                        }
-                                    </div>
+                                    <button className="btn btn-warning me-2" onClick={() => abrirModal(curso)}>Editar</button>
+                                    <button className={`btn ${curso.estado === 'ACTIVO' ? 'btn-danger' : 'btn-success'}`} onClick={() => toggleEstado(curso.codigoCurso)}>
+                                        {curso.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'}
+                                    </button>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </section>
-                <section>
-                    <table className="table table-dark">
-                        <thead>
-                            <tr>
-                                <th scope="col"> Código </th>
-                                <th scope="col"> Nivel </th>
-                                <th scope="col">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                cursos.map((curso) =>
-                                    <tr className="table-primary" key={curso.codigoCurso}>
-                                        <td> {curso.codigoCurso} </td>
-                                        <td> {curso.nivel} </td>
-                                        <td>
-                                            <div className="btn-group" role="group" aria-label="Basic mixed styles example">
-                                                <button onClick={() => {eliminarCurso(curso.codigoCurso)}} type="button" className="btn btn-danger"> Eliminar </button>
-                                                <button onClick={() => {editarCurso(curso)}} type="button" className="btn btn-success"> Actualizar </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            }
-                        </tbody>
-                    </table>
-                </section>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-        </>
-    )
+
+            <Modal show={modalShow} onHide={cerrarModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{esNuevo ? 'Agregar Curso' : 'Editar Curso'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group>
+                            <Form.Label>Código del Curso</Form.Label>
+                            <Form.Control type="text" name="codigoCurso" value={cursoActual.codigoCurso} onChange={handleInputChange} disabled={!esNuevo} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Nombre del Curso</Form.Label>
+                            <Form.Control type="text" name="nombre" value={cursoActual.nombre} onChange={handleInputChange} />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={cerrarModal}>Cancelar</Button>
+                    <Button variant="primary" onClick={guardarCurso}>Guardar</Button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+    );
 }
 
 export default ComponenteCursos;
