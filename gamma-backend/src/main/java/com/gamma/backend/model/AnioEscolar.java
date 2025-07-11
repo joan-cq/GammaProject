@@ -16,9 +16,9 @@ public class AnioEscolar {
     @Column(name = "id_anio")
     private Long id;
 
-    @Column(name = "anio", nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private int anio;
 
-    @Column(name = "estado", nullable = false)
-    private String estado;  // Valores esperados: "ACTIVO" o "INACTIVO"
+    @Column(nullable = false)
+    private String estado;
 }

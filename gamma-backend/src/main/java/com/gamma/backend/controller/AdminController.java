@@ -5,7 +5,7 @@ import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AdministradorRepository;
 import com.gamma.backend.repository.UserRepository;
-import com.gamma.backend.service.otherservice.AnioEscolarService;
+import com.gamma.backend.service.modelservice.AnioEscolarService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

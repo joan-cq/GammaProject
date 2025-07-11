@@ -1,52 +1,42 @@
 package com.gamma.backend.controller;
 
 import com.gamma.backend.model.Nota;
-import com.gamma.backend.repository.NotaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.gamma.backend.model.Alumno;
+import com.gamma.backend.model.Bimestre;
+import com.gamma.backend.model.Curso;
 import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
+import com.gamma.backend.service.modelservice.NotaService;
+import com.gamma.backend.repository.AlumnoRepository;
+import com.gamma.backend.repository.BimestreRepository;
+import com.gamma.backend.repository.CursoRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
+@RequestMapping("/nota")
+@RequiredArgsConstructor
 public class NotaController {
 
-    @Autowired
-    private NotaRepository notaRepository;
+    private final NotaService notaService;
 
-    @GetMapping("/nota/list")
-    public ResponseEntity<List<Nota>> listarNotas() {
-        List<Nota> notas = notaRepository.findAll();
-        return ResponseEntity.ok(notas);
+    @GetMapping
+    public List<Nota> obtenerNotas(@RequestParam String grado, @RequestParam Long bimestre, @RequestParam String dniProfesor) {
+        return notaService.obtenerNotasPorGradoYBimestre(grado, bimestre, dniProfesor);
     }
 
-    @PostMapping("/nota/add")
-    public ResponseEntity<Nota> agregarNota(@RequestBody Nota nota) {
-        Nota nuevaNota = notaRepository.save(nota);
-        return ResponseEntity.ok(nuevaNota);
+    @PostMapping("/add")
+    public ResponseEntity<String> registrarNota(@RequestBody Nota nota) {
+        notaService.guardarNota(nota);
+        return ResponseEntity.ok("Nota registrada");
     }
 
-    @PutMapping("/nota/update/{id}")
-    public ResponseEntity<Nota> actualizarNota(@PathVariable Long id, @RequestBody Nota nota) {
-        Nota notaExistente = notaRepository.findById(id).orElse(null);
-        if (notaExistente != null) {
-            nota.setId(id);
-            Nota notaActualizada = notaRepository.save(nota);
-            return ResponseEntity.ok(notaActualizada);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/nota/delete/{id}")
-    public ResponseEntity<?> eliminarNota(@PathVariable Long id) {
-        Nota notaExistente = notaRepository.findById(id).orElse(null);
-        if (notaExistente != null) {
-            notaRepository.deleteById(id);
-            return ResponseEntity.ok(Map.of("mensaje", "Nota eliminada con éxito"));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/update")
+    public ResponseEntity<String> actualizarNota(@RequestBody Nota nota) {
+        notaService.actualizarNota(nota);
+        return ResponseEntity.ok("Nota actualizada");
     }
 }

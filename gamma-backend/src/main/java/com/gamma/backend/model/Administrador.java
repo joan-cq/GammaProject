@@ -12,7 +12,7 @@ import lombok.*;
 public class Administrador {
 
     @Id
-    @Column(name = "dni")
+    @Column(name="dni")
     private String dni;
 
     @OneToOne

@@ -168,6 +168,7 @@ function ComponenteAdministradores() {
         setClave("");
         setError('');
     }
+
     useEffect(() => {
         fetchListarAdministrador();
     }, [])

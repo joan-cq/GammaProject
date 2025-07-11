@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.gamma.backend.model.Alumno;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AlumnoRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,9 @@ public class AlumnoController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AnioEscolarService anioEscolarService;
 
     @GetMapping("/alumno/list")
     public ResponseEntity<List<Alumno>> listarAlumnos() {

@@ -1,172 +1,193 @@
-import React, { useState, useEffect } from "react";
-import {ComponentePanelProfesores} from "./index.js";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import { Modal, Button, Form } from "react-bootstrap";
+import { ComponentePanelProfesores } from "./index";
 
 function ComponenteProNotas() {
+    const [bimestres, setBimestres] = useState([]);
+    const [grados, setGrados] = useState([]);
+    const [alumnos, setAlumnos] = useState([]);
     const [notas, setNotas] = useState([]);
-    const [notasId, setNotasId] = useState("");
-    const [notasDniAlumno, setNotasDniAlumno] = useState("");
-    const [notasCalificacion, setNotasCalificacion] = useState("");
-    const [notasCodigoCurso, setNotasCodigoCurso] = useState("");
-    const [editar, setEditar] = useState(false);
+    const [bimestreSeleccionado, setBimestreSeleccionado] = useState("");
+    const [gradoSeleccionado, setGradoSeleccionado] = useState("");
+    const [modalShow, setModalShow] = useState(false);
+    const [notaModal, setNotaModal] = useState({ dni: "", nombre: "", apellido: "", nota: "", accion: "", idNota: null });
+    const profesorDNI = localStorage.getItem("dni"); // Asegúrate de guardar el dni al hacer login
 
-    let resultado = Array.isArray(notas) ? notas : [];
-    if (notasDniAlumno) {
-        resultado = resultado.filter((dato) =>
-            dato.dni_alumno.toString().includes(notasDniAlumno.toString())
-        );
-    }
-
-    const fetchListaNotas = async () => {
+    const cargarFiltrosIniciales = async () => {
         try {
-            const apiURL = await fetch(`http://localhost:8080/notas`);
-            if (!apiURL.ok) {
-                console.log("LA API NOTAS NO EXISTE");
-            }
-            const data = await apiURL.json();
-            setNotas(data);
+            const bimestreRes = await axios.get("http://localhost:8080/bimestre/activos");
+            setBimestres(bimestreRes.data);
+
+            const codigoCurso = localStorage.getItem("codigoCurso");
+            const gradosRes = await axios.get(`http://localhost:8080/grado_curso/filtrar/${codigoCurso}`);
+            setGrados(gradosRes.data);
         } catch (error) {
-            console.log(error);
+            console.error("Error cargando filtros:", error);
         }
-    }
-    const agregarNota = () => {
-        axios.post("http://localhost:8080/nota/add", {
-            nota: notasCalificacion,
-            dni_alumno: notasDniAlumno,
-            codigo_curso: notasCodigoCurso,
-        }).then(() => {
-            fetchListaNotas();
-            setNotasId("");
-            setNotasDniAlumno("");
-            setNotasCalificacion("");
-            setNotasCodigoCurso("");
-            Swal.fire({
-                title: '¡Enhorabuena!',
-                text: '¡Nota agregado con éxito!',
-                icon: 'success',
-            });
-        })
     };
-    const eliminarNota = (id) => {
-        axios.delete(`http://localhost:8080/nota/delete/${id}`)
-            .then(() => {
-                fetchListaNotas();
-                Swal.fire({
-                    title: '¡Enhorabuena!',
-                    text: '¡Nota eliminada con éxito!',
-                    icon: 'success',
-                });
-            });
-    }
-    const editarNota = (nota) => {
-        setEditar(true);
-        setNotasId(nota.id);
-        setNotasDniAlumno(nota.alumno.dni);
-        setNotasCodigoCurso(nota.curso.codigoCurso);
-        setNotasCalificacion(nota.nota);
-    }
-    const actualizarNota = () => {
-        axios.put(`http://localhost:8080/nota/update/${notasId}`, {
-            nota: notasCalificacion,
-        }).then(() => {
-            setEditar(false);
-            fetchListaNotas();
-            setNotasId("");
-            setNotasDniAlumno("");
-            setNotasCalificacion("");
-            setNotasCodigoCurso("");
-            Swal.fire({
-                title: '¡Enhorabuena!',
-                text: '¡Nota actualizada con éxito!',
-                icon: 'success',
-            });
-        }).catch((error) => {
-            console.error("Error al actualizar el la nota:", error);
+
+    const cargarAlumnosYNotas = async () => {
+        if (!bimestreSeleccionado || !gradoSeleccionado) return;
+        try {
+            const alumnosRes = await axios.get(`http://localhost:8080/alumno/grado/${gradoSeleccionado}`);
+            setAlumnos(alumnosRes.data);
+
+            const notasRes = await axios.get(`http://localhost:8080/nota?grado=${gradoSeleccionado}&bimestre=${bimestreSeleccionado}&dniProfesor=${profesorDNI}`);
+            setNotas(notasRes.data);
+        } catch (error) {
+            console.error("Error cargando alumnos o notas:", error);
+        }
+    };
+
+    const abrirModal = (alumno, accion, idNota = null, notaActual = "") => {
+        setNotaModal({
+            dni: alumno.dni,
+            nombre: alumno.nombre,
+            apellido: alumno.apellido,
+            nota: notaActual,
+            accion,
+            idNota,
         });
-    }
+        setModalShow(true);
+    };
+
+    const guardarNota = async () => {
+        const { dni, nota, accion, idNota } = notaModal;
+        if (!nota || isNaN(nota)) {
+            Swal.fire("Error", "Ingresa una nota válida", "error");
+            return;
+        }
+
+        try {
+            if (accion === "AGREGAR") {
+                await axios.post("http://localhost:8080/nota/add", {
+                    dniAlumno: dni,
+                    codigoCurso: gradoSeleccionado.split("-")[1], // Asegúrate de enviar correctamente el curso
+                    idBimestre: bimestreSeleccionado,
+                    nota,
+                });
+                Swal.fire("¡Nota agregada!", "", "success");
+            } else {
+                await axios.put(`http://localhost:8080/nota/update`, {
+                    nota,
+                });
+                Swal.fire("¡Nota actualizada!", "", "success");
+            }
+            setModalShow(false);
+            cargarAlumnosYNotas();
+        } catch (error) {
+            console.error("Error guardando nota:", error);
+            Swal.fire("Error", "No se pudo guardar la nota", "error");
+        }
+    };
+
+    const obtenerNotaAlumno = (dniAlumno) => {
+        const nota = notas.find(n => n.alumno.dni === dniAlumno);
+        return nota || null;
+    };
 
     useEffect(() => {
-        fetchListaNotas();
-    }, [])
-    console.log(notas);
+        localStorage.setItem("codigoCurso", "COM");
+        cargarFiltrosIniciales();
+    }, []);
+
+    useEffect(() => {
+        cargarAlumnosYNotas();
+    }, [bimestreSeleccionado, gradoSeleccionado]);
+
     return (
-        <>
-            <ComponentePanelProfesores/>
-            <div className='container contenedorTabla'>
-                <h3> Lista Notas: </h3>
-                <section className="contenedorAddAlumno">
-                    <table className="table table-dark">
+        <div>
+            <ComponentePanelProfesores />
+            <div className="container">
+                <h3>Notas por Bimestre</h3>
+                <div className="row mb-3">
+                    <div className="col">
+                        <label>Bimestre</label>
+                        <select className="form-select" value={bimestreSeleccionado} onChange={(e) => setBimestreSeleccionado(e.target.value)}>
+                            <option value="">Selecciona un bimestre</option>
+                            {bimestres.map(b => (
+                                <option key={b.idBimestre} value={b.idBimestre}>{b.nombre}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="col">
+                        <label>Grado</label>
+                        <select className="form-select" value={gradoSeleccionado} onChange={(e) => setGradoSeleccionado(e.target.value)}>
+                            <option value="">Selecciona un grado</option>
+                            {grados.map(g => (
+                                <option key={g.codigoGrado} value={g.codigoGrado}>{g.nombreGrado} {g.nivel}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {alumnos.length > 0 && (
+                    <table className="table table-dark table-striped">
                         <thead>
                             <tr>
-                                <th scope="col"> ID Nota </th>
-                                <th scope="col"> DNI Alumno </th>
-                                <th scope="col"> Código Curso </th>
-                                <th scope="col"> Calificación </th>
-                                <th scope="col">Acción</th>
+                                <th>DNI</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Grado</th>
+                                <th>Nota</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="table-success">
-                                <td>
-                                    <input placeholder="No llenar" type="number" value={notasId} onChange={(e) => setNotasId(e.target.value)} disabled/>
-                                </td>
-                                <td>
-                                    <input type="number" value={notasDniAlumno} onChange={(e) => setNotasDniAlumno(e.target.value)} />
-                                </td>
-                                <td>
-                                    <input type="text" value={notasCodigoCurso} onChange={(e) => setNotasCodigoCurso(e.target.value)}/>
-                                </td>
-                                <td>
-                                    <input placeholder="00.00" type="text" value={notasCalificacion} onChange={(e) => setNotasCalificacion(e.target.value)}/>
-                                </td>
-                                <td>
-                                    <div role="group" aria-label="Basic mixed styles example">
-                                        {
-                                            editar === true ?
-                                            <button onClick={actualizarNota} className="btn btn-warning"> Actualizar </button> :
-                                            <button onClick={agregarNota} className="btn btn-success"> Agregar </button>
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-                <section>
-                    <table className="table table-dark">
-                        <thead>
-                            <tr>
-                                <th scope="col"> ID Nota </th>
-                                <th scope="col"> DNI </th>
-                                <th scope="col"> Código Curso </th>
-                                <th scope="col"> Calificación </th>
-                                <th scope="col">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                resultado.map((nota) => 
-                                    <tr className="table-primary" key={nota.id_nota}>
-                                        <td> {nota.id_nota} </td>
-                                        <td> {nota.dni_alumno} </td>
-                                        <td> {nota.codigo_curso} </td>
-                                        <td> {nota.nota} </td>
+                            {alumnos.map(alumno => {
+                                const notaObj = obtenerNotaAlumno(alumno.dni);
+                                return (
+                                    <tr key={alumno.dni}>
+                                        <td>{alumno.dni}</td>
+                                        <td>{alumno.nombre}</td>
+                                        <td>{alumno.apellido}</td>
+                                        <td>{alumno.codigoGrado}</td>
+                                        <td>{notaObj ? notaObj.nota : "SIN NOTA"}</td>
                                         <td>
-                                            <div className="btn-group" role="group" aria-label="Basic mixed styles example">
-                                                <button onClick={() => {editarNota(nota)}} type="button" className="btn btn-success"> Editar </button>
-                                                <button onClick={() => {eliminarNota(nota.id)}} type="button" className="btn btn-danger"> Eliminar </button>
-                                            </div>
+                                            <button
+                                                className={`btn ${notaObj ? 'btn-warning' : 'btn-success'}`}
+                                                onClick={() =>
+                                                    abrirModal(alumno, notaObj ? "EDITAR" : "AGREGAR", notaObj?.idNota, notaObj?.nota)
+                                                }
+                                            >
+                                                {notaObj ? "Editar" : "Agregar"}
+                                            </button>
                                         </td>
                                     </tr>
-                                )
-                            }
+                                );
+                            })}
                         </tbody>
                     </table>
-                </section>
+                )}
+
+                <Modal show={modalShow} onHide={() => setModalShow(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{notaModal.accion === "AGREGAR" ? "Agregar Nota" : "Editar Nota"}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p><strong>Alumno:</strong> {notaModal.nombre} {notaModal.apellido}</p>
+                        <p><strong>DNI:</strong> {notaModal.dni}</p>
+                        <Form.Group>
+                            <Form.Label>Nota</Form.Label>
+                            <Form.Control
+                                type="number"
+                                value={notaModal.nota}
+                                onChange={(e) => setNotaModal({ ...notaModal, nota: e.target.value })}
+                                placeholder="00.00"
+                                min="0" max="20"
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setModalShow(false)}>Cancelar</Button>
+                        <Button variant="primary" onClick={guardarNota}>Guardar</Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
-        </>
-    )
+        </div>
+    );
 }
 
 export default ComponenteProNotas;

@@ -1,4 +1,4 @@
-package com.gamma.backend.service.otherservice;
+package com.gamma.backend.service.modelservice;
 
 import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.AnioEscolarRepository;

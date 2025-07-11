@@ -2,7 +2,6 @@ package com.gamma.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "nota")
@@ -18,20 +17,20 @@ public class Nota {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "dni_alumno", referencedColumnName = "dni")
+    @JoinColumn(name = "dni_alumno")
     private Alumno alumno;
 
     @ManyToOne
-    @JoinColumn(name = "codigo_curso", referencedColumnName = "codigo_curso")
+    @JoinColumn(name = "codigo_curso")
     private Curso curso;
 
     @ManyToOne
-    @JoinColumn(name = "id_anio", referencedColumnName = "id_anio")
-    private AnioEscolar anioEscolar;
+    @JoinColumn(name = "id_bimestre")
+    private Bimestre bimestre;
 
-    @Column(name = "nota")
-    private BigDecimal nota;
+    private Double nota;
 
-    @Column(name = "editable")
-    private Boolean editable;
+    public Long getIdNota() {
+        return id;
+    }
 }

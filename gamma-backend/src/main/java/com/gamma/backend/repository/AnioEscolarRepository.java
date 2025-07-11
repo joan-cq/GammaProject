@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.List;
 
 @Repository
-public interface AnioEscolarRepository extends JpaRepository<AnioEscolar, Integer> {
+public interface AnioEscolarRepository extends JpaRepository<AnioEscolar, Long> {
     
     // Buscar por año (ej. 2025)
     Optional<AnioEscolar> findByAnio(int anio);

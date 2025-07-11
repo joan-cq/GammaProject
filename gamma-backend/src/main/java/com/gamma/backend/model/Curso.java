@@ -2,7 +2,6 @@ package com.gamma.backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
 @Entity
 @Table(name = "curso")
@@ -13,13 +12,12 @@ import java.util.List;
 public class Curso {
 
     @Id
-    @Column(name = "codigo_curso")
+    @Column(name = "codigo_curso", length = 10)
     private String codigoCurso;
 
-    @Column(name = "nivel")
-    private String nivel;  // PRIMARIA o SECUNDARIA
+    @Column(nullable = false)
+    private String nombre;
 
-    // Relación inversa 
-    @OneToMany(mappedBy = "curso")
-    private List<Profesor> profesores;
+    @Column(nullable = false)
+    private String estado;
 }

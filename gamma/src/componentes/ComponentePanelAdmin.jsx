@@ -8,6 +8,7 @@ function ComponentePanel() {
             <Link to="/panel/listacursos">Listado Cursos</Link>
             <Link to="/panel/listaadmin">Listado Administradores </Link>
             <Link to="/panel/listamaestros">Listado Profesores </Link>
+            <Link to="/panel/anioescolar">Año Activo </Link>
         </nav>
     );
 }

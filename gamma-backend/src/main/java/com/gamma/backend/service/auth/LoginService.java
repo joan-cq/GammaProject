@@ -3,7 +3,8 @@ package com.gamma.backend.service.auth;
 import com.gamma.backend.model.User;
 import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.UserRepository;
-import com.gamma.backend.service.otherservice.AnioEscolarService;
+import com.gamma.backend.service.modelservice.AnioEscolarService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

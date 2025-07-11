@@ -24,11 +24,12 @@ public class CursoController {
     @PostMapping("/curso/add")
     public ResponseEntity<?> agregarCurso(@RequestBody Map<String, String> payload) {
         String codigoCurso = payload.get("codigoCurso");
-        String nivel = payload.get("nivel");
+        String nombre = payload.get("nombre");
 
         Curso curso = new Curso();
         curso.setCodigoCurso(codigoCurso);
-        curso.setNivel(nivel);
+        curso.setNombre(nombre);
+        curso.setEstado("");
 
         cursoRepository.save(curso);
 
@@ -40,7 +41,7 @@ public class CursoController {
         Curso cursoExistente = cursoRepository.findById(curso.getCodigoCurso()).orElse(null);
 
         if (cursoExistente != null) {
-            cursoExistente.setNivel(curso.getNivel());
+            cursoExistente.setEstado("ACTIVO");
 
             Curso cursoActualizado = cursoRepository.save(cursoExistente);
             return ResponseEntity.ok(cursoActualizado);
