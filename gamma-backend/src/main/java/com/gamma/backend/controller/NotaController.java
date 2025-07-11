@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -47,13 +48,18 @@ public class NotaController {
 
         List<Map<String, Object>> alumnosConNotas = alumnos.stream().map(alumno -> {
             Nota nota = notaRepository.findByAlumno_DniAndCurso_CodigoCursoAndBimestre_Id(alumno.getDni(), codigoCurso, idBimestre);
-            Map<String, Object> alumnoConNota = Map.of(
-                    "dni", alumno.getDni(),
-                    "nombre", alumno.getNombre(),
-                    "apellido", alumno.getApellido(),
-                    "codigo_grado", alumno.getCodigoGrado(),
-                    "nota", nota != null ? nota.getNota() : null
-            );
+            Map<String, Object> alumnoConNota = new HashMap<>();
+            alumnoConNota.put("dni", alumno.getDni());
+            alumnoConNota.put("nombre", alumno.getNombre());
+            alumnoConNota.put("apellido", alumno.getApellido());
+            alumnoConNota.put("codigo_grado", alumno.getCodigoGrado());
+            if (nota != null) {
+                alumnoConNota.put("nota", nota.getNota());
+                alumnoConNota.put("idNota", nota.getId());
+            } else {
+                alumnoConNota.put("nota", null);
+                alumnoConNota.put("idNota", null);
+            }
             return alumnoConNota;
         }).collect(Collectors.toList());
 

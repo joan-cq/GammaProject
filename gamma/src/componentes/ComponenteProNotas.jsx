@@ -10,7 +10,6 @@ function ComponenteProNotas() {
     const [bimestres, setBimestres] = useState([]);
     const [grados, setGrados] = useState([]);
     const [alumnos, setAlumnos] = useState([]);
-    const [notas, setNotas] = useState([]);
     const [bimestreSeleccionado, setBimestreSeleccionado] = useState("");
     const [gradoSeleccionado, setGradoSeleccionado] = useState("");
     const [modalShow, setModalShow] = useState(false);
@@ -31,12 +30,21 @@ function ComponenteProNotas() {
     };
 
     const cargarAlumnosYNotas = async () => {
-        if (!bimestreSeleccionado || !gradoSeleccionado) return;
+        if (!bimestreSeleccionado || !gradoSeleccionado) {
+            Swal.fire("Atención", "Por favor, selecciona un bimestre y un grado.", "info");
+            return;
+        }
+        console.log("Cargando alumnos con:", { gradoSeleccionado, bimestreSeleccionado, codigoCurso });
         try {
             const alumnosRes = await axios.get(`http://localhost:8080/notas/alumnos?codigoGrado=${gradoSeleccionado}&idBimestre=${bimestreSeleccionado}&codigoCurso=${codigoCurso}`);
+            console.log("Respuesta del backend:", alumnosRes.data);
             setAlumnos(alumnosRes.data);
+            if (alumnosRes.data.length === 0) {
+                Swal.fire("Información", "No se encontraron alumnos para los filtros seleccionados.", "info");
+            }
         } catch (error) {
             console.error("Error cargando alumnos o notas:", error);
+            Swal.fire("Error", "Hubo un problema al cargar los datos de los alumnos.", "error");
         }
     };
 
@@ -83,18 +91,11 @@ function ComponenteProNotas() {
         }
     };
 
-    const obtenerNotaAlumno = (dniAlumno) => {
-        const nota = notas.find(n => n.alumno.dni === dniAlumno);
-        return nota || null;
-    };
 
     useEffect(() => {
         cargarFiltrosIniciales();
     }, [codigoCurso]);
 
-    useEffect(() => {
-        cargarAlumnosYNotas();
-    }, [bimestreSeleccionado, gradoSeleccionado, codigoCurso]);
 
     return (
         <div>
@@ -107,7 +108,7 @@ function ComponenteProNotas() {
                         <select className="form-select" value={bimestreSeleccionado} onChange={(e) => setBimestreSeleccionado(e.target.value)}>
                             <option value="">Selecciona un bimestre</option>
                             {bimestres.map(b => (
-                                <option key={b.idBimestre} value={b.idBimestre}>{b.nombre}</option>
+                                <option key={b.id} value={b.id}>{b.nombre}</option>
                             ))}
                         </select>
                     </div>
@@ -120,45 +121,50 @@ function ComponenteProNotas() {
                             ))}
                         </select>
                     </div>
+                    <div className="col d-flex align-items-end">
+                        <button className="btn btn-primary" onClick={cargarAlumnosYNotas}>Buscar</button>
+                    </div>
                 </div>
 
                 {alumnos.length > 0 && (
-                    <table className="table table-dark table-striped">
-                        <thead>
-                            <tr>
-                                <th>DNI</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Grado</th>
-                                <th>Nota</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
+                    <div>
+                        <h5>Notas de Alumnos del {grados.find(g => g.codigoGrado === gradoSeleccionado)?.nombreGrado} {grados.find(g => g.codigoGrado === gradoSeleccionado)?.nivel} -- {bimestres.find(b => b.id === parseInt(bimestreSeleccionado))?.nombre}</h5>
+                        <table className="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>DNI</th>
+                                    <th>Nombre</th>
+                                    <th>Apellido</th>
+                                    <th>Grado</th>
+                                    <th>Nota</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
                         <tbody>
                             {alumnos.map(alumno => {
-                                const notaObj = obtenerNotaAlumno(alumno.dni);
                                 return (
                                     <tr key={alumno.dni}>
                                         <td>{alumno.dni}</td>
                                         <td>{alumno.nombre}</td>
                                         <td>{alumno.apellido}</td>
-                                        <td>{alumno.codigoGrado}</td>
-                                        <td>{notaObj ? notaObj.nota : "SIN NOTA"}</td>
+                                        <td>{alumno.codigo_grado}</td>
+                                        <td>{alumno.nota !== null ? alumno.nota : "SIN NOTA"}</td>
                                         <td>
                                             <button
-                                                className={`btn ${notaObj ? 'btn-warning' : 'btn-success'}`}
+                                                className={`btn ${alumno.nota !== null ? 'btn-warning' : 'btn-success'}`}
                                                 onClick={() =>
-                                                    abrirModal(alumno, notaObj ? "EDITAR" : "AGREGAR", notaObj?.idNota, notaObj?.nota)
+                                                    abrirModal(alumno, alumno.nota !== null ? "EDITAR" : "AGREGAR", alumno.idNota, alumno.nota)
                                                 }
                                             >
-                                                {notaObj ? "Editar" : "Agregar"}
+                                                {alumno.nota !== null ? "Editar" : "Agregar"}
                                             </button>
                                         </td>
                                     </tr>
                                 );
                             })}
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
                 )}
 
                 <Modal show={modalShow} onHide={() => setModalShow(false)}>
