@@ -14,7 +14,7 @@ public class AnioEscolar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_anio")
-    private Long id;
+    private Integer id;
 
     @Column(unique = true, nullable = false)
     private int anio;

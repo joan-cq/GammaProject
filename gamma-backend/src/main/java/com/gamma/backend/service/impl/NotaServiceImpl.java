@@ -28,17 +28,19 @@ public class NotaServiceImpl implements NotaService {
     private final BimestreRepository bimestreRepository;
     private final AnioEscolarService anioEscolarService;
     private final ProfesorRepository profesorRepository;
+    private final GradoCursoRepository gradoCursoRepository;
 
     @Autowired
     public NotaServiceImpl(NotaRepository notaRepository, AlumnoRepository alumnoRepository,
                            CursoRepository cursoRepository, BimestreRepository bimestreRepository,
-                           AnioEscolarService anioEscolarService, ProfesorRepository profesorRepository) {
+                           AnioEscolarService anioEscolarService, ProfesorRepository profesorRepository, GradoCursoRepository gradoCursoRepository) {
         this.notaRepository = notaRepository;
         this.alumnoRepository = alumnoRepository;
         this.cursoRepository = cursoRepository;
         this.bimestreRepository = bimestreRepository;
         this.anioEscolarService = anioEscolarService;
         this.profesorRepository = profesorRepository;
+        this.gradoCursoRepository = gradoCursoRepository;
     }
 
     @Override
@@ -52,12 +54,8 @@ public class NotaServiceImpl implements NotaService {
         existente.setNota(nota.getNota());
         notaRepository.save(existente);
     }
-    @Autowired
-    private GradoCursoRepository gradoCursoRepository;
-
     @Override
     public List<Nota> obtenerNotasPorGradoYBimestre(String codigoGrado, Long idBimestre, String dniProfesor) {
-        List<Nota> notas = new ArrayList<>();
         Bimestre bimestre = bimestreRepository.findById(idBimestre).orElse(null);
         if (bimestre == null) {
             return new ArrayList<>();
@@ -68,10 +66,22 @@ public class NotaServiceImpl implements NotaService {
             return new ArrayList<>();
         }
 
-        List<Alumno> alumnos = alumnoRepository.findByGrado(codigoGrado);
+        Profesor profesor = profesorRepository.findById(dniProfesor).orElse(null);
+        if (profesor == null) {
+            return new ArrayList<>();
+        }
+
+        List<GradoCurso> gradoCursos = gradoCursoRepository.findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(codigoGrado, anioActivo.getId(), "ACTIVO");
+        List<Alumno> alumnos = alumnoRepository.findByCodigoGrado(codigoGrado);
+        List<Nota> notas = new ArrayList<>();
+
         for (Alumno alumno : alumnos) {
-            Optional<Nota> notaOptional = notaRepository.findByAlumnoAndBimestre(alumno, bimestre);
-            notaOptional.ifPresent(notas::add);
+            for (GradoCurso gradoCurso : gradoCursos) {
+                if (gradoCurso.getCurso().equals(profesor.getCurso())) {
+                    Optional<Nota> notaOptional = notaRepository.findByAlumnoAndCursoAndBimestre(alumno, gradoCurso.getCurso(), bimestre);
+                    notaOptional.ifPresent(notas::add);
+                }
+            }
         }
 
         return notas;

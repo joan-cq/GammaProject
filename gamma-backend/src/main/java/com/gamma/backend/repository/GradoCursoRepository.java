@@ -8,8 +8,8 @@ import java.util.List;
 
 @Repository
 public interface GradoCursoRepository extends JpaRepository<GradoCurso, Long> {
-    List<GradoCurso> findByCursoCodigoCursoAndAnioEscolarIdAndEstado(String codigoCurso, Long anioEscolar, String estado);
-    List<GradoCurso> findByGradoCodigoGradoAndAnioEscolarIdAndEstado(String grado, Long anioEscolar, String estado);
-    List<GradoCurso> findByGradoCodigoGradoAndCursoCodigoCursoAndAnioEscolarIdAndEstado(String grado, String codigoCurso, Long anioEscolar, String estado);
+    List<GradoCurso> findByCurso_CodigoCursoAndAnioEscolar_IdAndEstado(String codigoCurso, Integer anioEscolarId, String estado);
+    List<GradoCurso> findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(String grado, Integer anioEscolarId, String estado);
+    List<GradoCurso> findByGrado_CodigoGradoAndCurso_CodigoCursoAndAnioEscolar_IdAndEstado(String grado, String codigoCurso, Integer anioEscolarId, String estado);
 }
 

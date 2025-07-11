@@ -34,6 +34,10 @@ public class Alumno {
     @Column(name = "grado")
     private String grado;
 
+
+    @Column(name = "codigo_grado")
+    private String codigoGrado;
+
     @Column(name = "nivel")
     private String nivel;
 
@@ -58,5 +62,9 @@ public class Alumno {
 
     public void setClave(String clave) {
         this.user.setClave(clave);
+    }
+
+    public String getCodigoGrado() {
+        return codigoGrado;
     }
 }

@@ -25,7 +25,7 @@ public class AnioEscolarService {
     }
 
     // Obtener el ID de un año activo (si solo esperas uno)
-    public Long getIdAnioEscolarActivo() {
+    public Integer getIdAnioEscolarActivo() {
         return obtenerAnioActivo()
                 .map(AnioEscolar::getId)
                 .orElseThrow(() -> new RuntimeException("No hay año escolar activo"));

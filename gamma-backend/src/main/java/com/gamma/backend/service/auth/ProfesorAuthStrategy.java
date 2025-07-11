@@ -18,7 +18,7 @@ public class ProfesorAuthStrategy implements RoleAuthStrategy {
     }
 
     @Override
-    public boolean estaActivo(String dni, Long anioActivo) {
+    public boolean estaActivo(String dni, Integer anioActivo) {
         Profesor profesor = profesorRepository.findByDni(dni);
         return profesor != null &&
             "ACTIVO".equalsIgnoreCase(profesor.getEstado()) &&

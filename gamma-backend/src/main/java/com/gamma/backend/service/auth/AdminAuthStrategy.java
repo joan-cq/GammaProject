@@ -17,7 +17,7 @@ public class AdminAuthStrategy implements RoleAuthStrategy {
     }
 
     @Override
-    public boolean estaActivo(String dni, Long anioActivo) {
+    public boolean estaActivo(String dni, Integer anioActivo) {
         Administrador administrador = administradorRepository.findByDni(dni);
         return administrador != null &&
             "ACTIVO".equalsIgnoreCase(administrador.getEstado()) &&

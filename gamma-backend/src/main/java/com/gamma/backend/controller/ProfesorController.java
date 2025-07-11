@@ -164,4 +164,16 @@ public class ProfesorController {
             return ResponseEntity.notFound().build();
         }
     }
+    @Autowired
+    private com.gamma.backend.service.modelservice.ProfesorService profesorService;
+
+    @GetMapping("/profesor/codigo_curso")
+    public ResponseEntity<?> obtenerCodigoCurso(@RequestParam String dni) {
+        String codigoCurso = profesorService.obtenerCodigoCursoPorDni(dni);
+        if (codigoCurso != null) {
+            return ResponseEntity.ok(Map.of("codigo_curso", codigoCurso));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

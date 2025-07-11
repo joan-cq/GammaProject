@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from '../App';
 import axios from "axios";
 import Swal from 'sweetalert2';
 import { Modal, Button, Form } from "react-bootstrap";
 import { ComponentePanelProfesores } from "./index";
 
 function ComponenteProNotas() {
+    const auth = useAuth();
     const [bimestres, setBimestres] = useState([]);
     const [grados, setGrados] = useState([]);
     const [alumnos, setAlumnos] = useState([]);
@@ -13,14 +15,14 @@ function ComponenteProNotas() {
     const [gradoSeleccionado, setGradoSeleccionado] = useState("");
     const [modalShow, setModalShow] = useState(false);
     const [notaModal, setNotaModal] = useState({ dni: "", nombre: "", apellido: "", nota: "", accion: "", idNota: null });
-    const profesorDNI = localStorage.getItem("dni"); // Asegúrate de guardar el dni al hacer login
+
+    const [codigoCurso, setCodigoCurso] = useState(auth.usuario?.CodigoCurso || "");
 
     const cargarFiltrosIniciales = async () => {
         try {
             const bimestreRes = await axios.get("http://localhost:8080/bimestre/activos");
             setBimestres(bimestreRes.data);
 
-            const codigoCurso = localStorage.getItem("codigoCurso");
             const gradosRes = await axios.get(`http://localhost:8080/grado_curso/filtrar/${codigoCurso}`);
             setGrados(gradosRes.data);
         } catch (error) {
@@ -31,11 +33,8 @@ function ComponenteProNotas() {
     const cargarAlumnosYNotas = async () => {
         if (!bimestreSeleccionado || !gradoSeleccionado) return;
         try {
-            const alumnosRes = await axios.get(`http://localhost:8080/alumno/grado/${gradoSeleccionado}`);
+            const alumnosRes = await axios.get(`http://localhost:8080/notas/alumnos?codigoGrado=${gradoSeleccionado}&idBimestre=${bimestreSeleccionado}&codigoCurso=${codigoCurso}`);
             setAlumnos(alumnosRes.data);
-
-            const notasRes = await axios.get(`http://localhost:8080/nota?grado=${gradoSeleccionado}&bimestre=${bimestreSeleccionado}&dniProfesor=${profesorDNI}`);
-            setNotas(notasRes.data);
         } catch (error) {
             console.error("Error cargando alumnos o notas:", error);
         }
@@ -64,19 +63,20 @@ function ComponenteProNotas() {
             if (accion === "AGREGAR") {
                 await axios.post("http://localhost:8080/nota/add", {
                     dniAlumno: dni,
-                    codigoCurso: gradoSeleccionado.split("-")[1], // Asegúrate de enviar correctamente el curso
+                    codigoCurso: codigoCurso,
                     idBimestre: bimestreSeleccionado,
-                    nota,
+                    nota: nota,
                 });
                 Swal.fire("¡Nota agregada!", "", "success");
             } else {
                 await axios.put(`http://localhost:8080/nota/update`, {
-                    nota,
+                    idNota: idNota,
+                    nota: nota,
                 });
                 Swal.fire("¡Nota actualizada!", "", "success");
             }
             setModalShow(false);
-            cargarAlumnosYNotas();
+            await cargarAlumnosYNotas();
         } catch (error) {
             console.error("Error guardando nota:", error);
             Swal.fire("Error", "No se pudo guardar la nota", "error");
@@ -89,13 +89,12 @@ function ComponenteProNotas() {
     };
 
     useEffect(() => {
-        localStorage.setItem("codigoCurso", "COM");
         cargarFiltrosIniciales();
-    }, []);
+    }, [codigoCurso]);
 
     useEffect(() => {
         cargarAlumnosYNotas();
-    }, [bimestreSeleccionado, gradoSeleccionado]);
+    }, [bimestreSeleccionado, gradoSeleccionado, codigoCurso]);
 
     return (
         <div>

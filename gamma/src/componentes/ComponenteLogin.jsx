@@ -37,7 +37,16 @@ function ComponenteLogin() {
                     text: '¡Credenciales Correctas!',
                     icon: 'success',
                 });
-                auth.iniciarSesion({ Rol: data.rol, Clave: data.clave });
+                
+                if (data.rol === "PROFESOR") {
+                    const codigoCursoResponse = await fetch(`http://localhost:8080/profesor/codigo_curso?dni=${idUsuario}`);
+                    const codigoCursoData = await codigoCursoResponse.json();
+                    console.log("Respuesta del backend para codigo_curso:", codigoCursoData);
+                    auth.iniciarSesion({ Rol: data.rol, Clave: data.clave, CodigoCurso: codigoCursoData.codigo_curso });
+                } else {
+                    auth.iniciarSesion({ Rol: data.rol, Clave: data.clave });
+                }
+
                 // Redirigir al panel correspondiente según el rol
                 if (data.rol === "ADMINISTRADOR") {
                     navigate('/panel/listaalumnos');

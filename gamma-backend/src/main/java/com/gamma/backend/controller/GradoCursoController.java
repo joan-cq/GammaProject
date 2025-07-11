@@ -35,7 +35,7 @@ public class GradoCursoController {
         logger.info("Entrando al método listarGradosPorCurso con codigoCurso: {}", codigoCurso);
         AnioEscolar anioActivo = anioEscolarService.obtenerAnioActivo().orElse(null);
         logger.info("Anio activo: {}", anioActivo);
-        List<GradoCurso> relaciones = gradoCursoRepository.findByCursoCodigoCursoAndAnioEscolarIdAndEstado(
+        List<GradoCurso> relaciones = gradoCursoRepository.findByCurso_CodigoCursoAndAnioEscolar_IdAndEstado(
             codigoCurso, anioActivo.getId(), "ACTIVO"
         );
         logger.info("Relaciones encontradas: {}", relaciones);

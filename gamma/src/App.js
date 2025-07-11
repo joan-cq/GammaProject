@@ -32,8 +32,8 @@ function App() {
     const [usuario, setUsuario] = useState(null);
 
     // Función para iniciar sesión
-    const iniciarSesion = (usuario) => {
-        setUsuario(usuario);
+    const iniciarSesion = (userData) => {
+        setUsuario(userData);
     };
 
     // Función para cerrar sesión

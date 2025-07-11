@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface AlumnoRepository extends JpaRepository<Alumno, String> {
     Alumno findByDni(String dni);
+    List<Alumno> findByCodigoGrado(String codigoGrado);
     List<Alumno> findByAnioEscolar(AnioEscolar anioEscolar);
     List<Alumno> findByAnioEscolarIn(List<AnioEscolar> anios);
     List<Alumno> findByAnioEscolar_Anio(int anio);
