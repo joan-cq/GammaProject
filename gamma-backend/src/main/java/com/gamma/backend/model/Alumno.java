@@ -31,15 +31,8 @@ public class Alumno {
     @Column(name = "genero")
     private String genero;
 
-    @Column(name = "grado")
-    private String grado;
-
-
     @Column(name = "codigo_grado")
     private String codigoGrado;
-
-    @Column(name = "nivel")
-    private String nivel;
 
     @ManyToOne
     @JoinColumn(name = "id_anio")

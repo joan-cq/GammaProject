@@ -14,5 +14,4 @@ public interface AlumnoRepository extends JpaRepository<Alumno, String> {
     List<Alumno> findByAnioEscolar(AnioEscolar anioEscolar);
     List<Alumno> findByAnioEscolarIn(List<AnioEscolar> anios);
     List<Alumno> findByAnioEscolar_Anio(int anio);
-    List<Alumno> findByGrado(String grado);
 }

@@ -52,8 +52,6 @@ public class AlumnoController {
             AlumnoExistente.setApellido(Alumno.getApellido());
             AlumnoExistente.setCelularApoderado(Alumno.getCelularApoderado());
             AlumnoExistente.setGenero(Alumno.getGenero());
-            AlumnoExistente.setGrado(Alumno.getGrado());
-            AlumnoExistente.setNivel(Alumno.getNivel());
             AlumnoExistente.setEstado(Alumno.getEstado());
 
             // Obtener el usuario asociado al Alumno
@@ -87,8 +85,6 @@ public class AlumnoController {
         String clave = payload.get("clave");
         String estado = payload.get("estado");
         String genero = payload.get("genero");
-        String nivel = payload.get("nivel");
-        String grado = payload.get("grado");
 
         // Crear el usuario
         User user = new User();
@@ -105,8 +101,6 @@ public class AlumnoController {
         Alumno.setCelularApoderado(celularApoderado);
         Alumno.setEstado(estado);
         Alumno.setGenero(genero);
-        Alumno.setNivel(nivel);
-        Alumno.setGrado(grado);
         alumnoRepository.save(Alumno);
         logger.info("Alumno con DNI {} agregado.", dni);
 
