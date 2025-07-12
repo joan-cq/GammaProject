@@ -25,14 +25,24 @@
     align-items: center;
 }
 
-.password-toggle {
+.password-toggle-admin {
     position: absolute;
-    right: 5px;
+    right: 80px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     user-select: none;
 }
+
+.password-toggle-profe {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    user-select: none;
+}
+
 .contenedorTabla .contenedorAdd input,
 .contenedorTabla .contenedorAdd select{
     vertical-align: middle;

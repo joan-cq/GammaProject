@@ -35,6 +35,9 @@ public class Administrador {
     @Column(name = "estado")
     private String estado;
 
+    @Transient
+    private int anio;
+
     public String getRol() {
         return this.user.getRol();
     }

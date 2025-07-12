@@ -41,6 +41,9 @@ public class Profesor {
     @Column(name = "estado")
     private String estado;
 
+    @Transient
+    private int anio;
+
     public String getRol() {
         return this.user.getRol();
     }
@@ -64,4 +67,5 @@ public class Profesor {
     public void setCodigoCurso(String codigoCurso) {
         this.curso.setCodigoCurso(codigoCurso);
     }
+
 }

@@ -5,15 +5,14 @@ import { ComponentePanelAdmin, ComponenteUpdatePassword } from "./index.js";
 
 function ComponenteAlumnos() {
     const [alumnos, setAlumnos] = useState([]);
-    const [alumnoDNI, setAlumnoDNI] = useState("");
-    const [alumnoNombre, setAlumnoNombre] = useState("");
-    const [alumnoApellido, setAlumnoApellido] = useState("");
-    const [alumnoCelApoderado, setAlumnoCelApoderado] = useState("");
-    const [alumnoGenero, setAlumnoGenero] = useState("");
-    const [alumnoNivel, setAlumnoNivel] = useState("");
-    const [alumnoGrado, setAlumnoGrado] = useState("");
+    const [grados, setGrados] = useState([]);
+    const [dni, setDni] = useState("");
+    const [nombre, setNombre] = useState("");
+    const [apellido, setApellido] = useState("");
+    const [celularApoderado, setCelularApoderado] = useState("");
+    const [genero, setGenero] = useState("");
+    const [codigoGrado, setCodigoGrado] = useState("");
     const [estado, setEstado] = useState("");
-    const [rol, setRol] = useState("");
     const [clave, setClave] = useState("");
     const [mostrarClave, setMostrarClave] = useState(false);
     const [editar, setEditar] = useState(false);
@@ -21,101 +20,70 @@ function ComponenteAlumnos() {
     const [selectedAlumno, setSelectedAlumno] = useState(null);
     const [error, setError] = useState('');
 
-    const fetchListarAlumno = async () => {
+    const fetchListarAlumnos = async () => {
         try {
-            const apiURL = await fetch("http://localhost:8080/alumno/list");
-            if (!apiURL.ok) {
-                console.log("LA API ALUMNO NO EXISTE");
-            }
-            const data = await apiURL.json();
-            setAlumnos(data);
+            const res = await axios.get("http://localhost:8080/alumno/list");
+            setAlumnos(res.data);
         } catch (error) {
-            console.log(error);
+            console.error("Error al obtener alumnos:", error);
         }
     };
 
+    const fetchGrados = async () => {
+        try {
+            const res = await axios.get("http://localhost:8080/grado/list");
+            setGrados(res.data);
+        } catch (error) {
+            console.error("Error cargando grados:", error);
+        }
+    };
+
+    const limpiarFormulario = () => {
+        setDni("");
+        setNombre("");
+        setApellido("");
+        setCelularApoderado("");
+        setGenero("");
+        setCodigoGrado("");
+        setEstado("");
+        setClave("");
+        setError('');
+        setEditar(false);
+    };
+
     const agregarAlumno = () => {
-        if (!alumnoDNI || !alumnoNombre || !alumnoApellido || !alumnoCelApoderado || !alumnoGenero || !alumnoNivel || !alumnoGrado || !estado) {
+        if (!dni || !nombre || !apellido || !celularApoderado || !genero || !codigoGrado || !clave) {
             setError('Por favor, complete todos los campos.');
             return;
         }
 
         axios.post("http://localhost:8080/alumno/add", {
-            dni: alumnoDNI,
-            nombre: alumnoNombre,
-            apellido: alumnoApellido,
-            celularApoderado: alumnoCelApoderado,
-            genero: alumnoGenero,
-            nivel: alumnoNivel,
-            grado: alumnoGrado,
-            estado: estado,
-            rol: rol,
-            clave: clave
+            dni, nombre, apellido, celularApoderado, genero, codigo_grado: codigoGrado, clave
         })
-            .then(() => {
-                fetchListarAlumno();
-                setAlumnoDNI("");
-                setAlumnoNombre("");
-                setAlumnoApellido("");
-                setAlumnoCelApoderado("");
-                setAlumnoGenero("");
-                setAlumnoNivel("");
-                setAlumnoGrado("");
-                setEstado("");
-                setRol("");
-                setClave("");
-                Swal.fire({
-                    title: '¡Enhorabuena!',
-                    text: '¡Alumno agregado con éxito!',
-                    icon: 'success',
-                });
-                setError('');
-            }).catch((error) => {
-                console.error("Error al agregar al alumno:", error);
-                setError('Error al agregar al alumno. Por favor, inténtelo de nuevo.');
-            });
+        .then(() => {
+            fetchListarAlumnos();
+            limpiarFormulario();
+            Swal.fire('¡Enhorabuena!', '¡Alumno agregado con éxito!', 'success');
+        }).catch((error) => {
+            console.error("Error al agregar al alumno:", error);
+            setError('Error al agregar al alumno. Por favor, inténtelo de nuevo.');
+        });
     };
 
     const eliminarAlumno = (dni) => {
-        const swalWithBootstrapButtons = Swal.mixin({
-            customClass: {
-                confirmButton: "btn btn-success",
-                cancelButton: "btn btn-danger"
-            },
-            buttonsStyling: false
-        });
-
-        swalWithBootstrapButtons.fire({
-            title: "¿Estas seguro?",
+        Swal.fire({
+            title: '¿Estas seguro?',
             text: "¡No podrás revertir el cambio!",
-            icon: "warning",
+            icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: "¡Si, eliminar!",
-            cancelButtonText: "¡No, cancelar!",
-            reverseButtons: true
+            confirmButtonText: '¡Si, eliminar!',
+            cancelButtonText: '¡No, cancelar!',
         }).then((result) => {
             if (result.isConfirmed) {
                 axios.delete(`http://localhost:8080/alumno/delete/${dni}`)
-                    .then(() => {
-                        fetchListarAlumno();
-                        Swal.fire({
-                            title: "¡Enhorabuena!",
-                            text: "¡Alumno eliminado con éxito!",
-                            icon: "success"
-                        });
-                    }).catch((error) => {
-                        console.error("Error al eliminar al alumno:", error);
-                        Swal.fire({
-                            title: "¡Error!",
-                            text: "¡No se pudo eliminar al alumno!",
-                            icon: "error"
-                        });
-                    });
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                Swal.fire({
-                    title: "¡Enhorabuena!",
-                    text: "¡Alumno no fue eliminado!",
-                    icon: "success"
+                .then(() => {
+                    fetchListarAlumnos();
+                    Swal.fire('¡Enhorabuena!', '¡Alumno eliminado con éxito!', 'success');
                 });
             }
         });
@@ -123,212 +91,128 @@ function ComponenteAlumnos() {
 
     const editarAlumno = (alumno) => {
         setEditar(true);
-        setAlumnoDNI(alumno.dni);
-        setAlumnoNombre(alumno.nombre);
-        setAlumnoApellido(alumno.apellido);
-        setAlumnoCelApoderado(alumno.celularApoderado);
-        setAlumnoGenero(alumno.genero);
-        setAlumnoNivel(alumno.nivel);
-        setAlumnoGrado(alumno.grado);
-        setRol(alumno.rol);
+        setDni(alumno.dni);
+        setNombre(alumno.nombre);
+        setApellido(alumno.apellido);
+        setCelularApoderado(alumno.celularApoderado);
+        setGenero(alumno.genero);
+        setCodigoGrado(alumno.codigoGrado);
         setEstado(alumno.estado);
-        setError('');
-    }
+    };
 
     const actualizarAlumno = () => {
-        if (!alumnoDNI || !alumnoNombre || !alumnoApellido || !alumnoCelApoderado || !alumnoGenero || !alumnoNivel || !alumnoGrado || !estado) {
+        if (!dni || !nombre || !apellido || !celularApoderado || !genero || !codigoGrado || !estado) {
             setError('Por favor, complete todos los campos.');
             return;
         }
 
         axios.put("http://localhost:8080/alumno/update", {
-            dni: alumnoDNI,
-            nombre: alumnoNombre,
-            apellido: alumnoApellido,
-            celularApoderado: alumnoCelApoderado,
-            genero: alumnoGenero,
-            nivel: alumnoNivel,
-            grado: alumnoGrado,
-            estado: estado,
-            user: {
-                rol: rol
-            }
+            dni, nombre, apellido, celularApoderado, genero, codigo_grado: codigoGrado, estado
         }).then(() => {
-            setEditar(false);
-            fetchListarAlumno();
-            setAlumnoDNI("");
-            setAlumnoNombre("");
-            setAlumnoApellido("");
-            setAlumnoCelApoderado("");
-            setAlumnoGenero("");
-            setAlumnoNivel("");
-            setAlumnoGrado("");
-            setEstado("");
-            setRol("");
-            setClave("");
-            Swal.fire({
-                title: '¡Enhorabuena!',
-                text: '¡Alumno actualizado con éxito!',
-                icon: 'success',
-            });
-            setError('');
+            fetchListarAlumnos();
+            limpiarFormulario();
+            Swal.fire('¡Enhorabuena!', '¡Alumno actualizado con éxito!', 'success');
         }).catch((error) => {
             console.error("Error al actualizar al alumno:", error);
             setError('Error al actualizar al alumno. Por favor, inténtelo de nuevo.');
         });
-    }
-
-    const cancelarAlumno = () => {
-        setEditar(false);
-        setAlumnoDNI("");
-        setAlumnoNombre("");
-        setAlumnoApellido("");
-        setAlumnoCelApoderado("");
-        setAlumnoGenero("");
-        setAlumnoNivel("");
-        setAlumnoGrado("");
-        setEstado("");
-        setRol("");
-        setClave("");
-        setError('');
     };
 
     useEffect(() => {
-        fetchListarAlumno();
+        fetchListarAlumnos();
+        fetchGrados();
     }, []);
 
     const editarPasswordAlumno = (alumno) => {
         setSelectedAlumno(alumno);
         setModalPasswordOpen(true);
-        setError('');
     };
 
     return (
         <>
             <ComponentePanelAdmin />
-            <div className='container contenedorAlumno'>
+            <div className='container contenedorTabla'>
                 <h3> Lista Alumnos: </h3>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <section className="contenedorAdd">
                     <table className="table table-dark">
                         <thead>
                             <tr>
-                                <th scope="col"> DNI </th>
-                                <th scope="col"> Nombre </th>
-                                <th scope="col"> Apellido </th>
-                                <th scope="col"> Celular_Apoderado </th>
-                                <th scope="col"> Género </th>
-                                <th scope="col"> Nivel </th>
-                                <th scope="col"> Grado </th>                              
-                                <th scope="col"> Rol </th>
-                                {editar ? null : (<th scope="col"> Contraseña </th>)}
-                                <th scope="col"> Estado </th>
+                                <th scope="col">DNI</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Apellido</th>
+                                <th scope="col">Cel. Apoderado</th>
+                                <th scope="col">Género</th>
+                                <th scope="col">Grado</th>
+                                {editar ? <th scope="col">Estado</th> : <th scope="col">Contraseña</th>}
                             </tr>
                         </thead>
                         <tbody>
                             <tr className="table-success">
+                                <td><input type="text" value={dni} onChange={(e) => setDni(e.target.value)} placeholder="DNI" disabled={editar} maxLength="8" /></td>
+                                <td><input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Nombre" /></td>
+                                <td><input type="text" value={apellido} onChange={(e) => setApellido(e.target.value)} placeholder="Apellido" /></td>
+                                <td><input type="text" value={celularApoderado} onChange={(e) => setCelularApoderado(e.target.value)} placeholder="Celular" maxLength="9" /></td>
                                 <td>
-                                    <input type="text" value={alumnoDNI} onChange={(e) => setAlumnoDNI(e.target.value)} placeholder="DNI" />
-                                </td>
-                                <td>
-                                    <input type="text" value={alumnoNombre} onChange={(e) => setAlumnoNombre(e.target.value)} placeholder="Nombre" />
-                                </td>
-                                <td>
-                                    <input type="text" value={alumnoApellido} onChange={(e) => setAlumnoApellido(e.target.value)} placeholder="Apellido" />
-                                </td>
-                                <td>
-                                    <input type="text" value={alumnoCelApoderado} onChange={(e) => setAlumnoCelApoderado(e.target.value)} placeholder="Celular" />
-                                </td>
-                                <td>
-                                    <select value={alumnoGenero} onChange={(e) => setAlumnoGenero(e.target.value)} placeholder="Género">
+                                    <select value={genero} onChange={(e) => setGenero(e.target.value)}>
                                         <option value="">Seleccionar Género</option>
-                                        <option value="M">M</option>
-                                        <option value="F">F</option>
+                                        <option value="MASCULINO">MASCULINO</option>
+                                        <option value="FEMENINO">FEMENINO</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <select value={alumnoNivel} onChange={(e) => setAlumnoNivel(e.target.value)} placeholder="Nivel">
-                                        <option value="">Seleccionar Nivel</option>
-                                        <option value="PRIMARIA">Primaria</option>
-                                        <option value="SECUNDARIA">Secundaria</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select value={alumnoGrado} onChange={(e) => setAlumnoGrado(e.target.value)} placeholder="Grado">
+                                    <select value={codigoGrado} onChange={(e) => setCodigoGrado(e.target.value)}>
                                         <option value="">Seleccionar Grado</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
+                                        {grados.map(g => <option key={g.codigoGrado} value={g.codigoGrado}>{g.nombreGrado}</option>)}
                                     </select>
                                 </td>
-                                <td>
-                                    <select value={rol} onChange={(e) => setRol(e.target.value)} placeholder="Rol">
-                                        <option value="">Seleccionar Rol</option>
-                                        <option value="ALUMNO">ALUMNO</option>
-                                    </select>
-                                </td>
-                                {editar ? null : (
+                                {editar ? (
+                                    <td>
+                                        <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+                                            <option value="">Seleccionar Estado</option>
+                                            <option value="ACTIVO">ACTIVO</option>
+                                            <option value="INACTIVO">INACTIVO</option>
+                                        </select>
+                                    </td>
+                                ) : (
                                     <td className="password-container">
-                                        <>
-                                            <input
-                                                type={mostrarClave ? "text" : "password"}
-                                                value={clave}
-                                                onChange={(e) => setClave(e.target.value)}
-                                                placeholder="Contraseña"
-                                            />
-                                            <span
-                                                className="password-toggle"
-                                                onClick={() => setMostrarClave(!mostrarClave)}
-                                            >
-                                                {mostrarClave ? "👁️" : "👁️‍🗨️"}
-                                            </span>
-                                        </>
+                                        <input type={mostrarClave ? "text" : "password"} value={clave} onChange={(e) => setClave(e.target.value)} placeholder="Contraseña" />
+                                        <span className="password-toggle" onClick={() => setMostrarClave(!mostrarClave)}>{mostrarClave ? "👁️" : "👁️‍🗨️"}</span>
                                     </td>
                                 )}
-                                <td>
-                                    <select value={estado} onChange={(e) => setEstado(e.target.value)} placeholder="Estado">
-                                        <option value="">Seleccionar Estado</option>
-                                        <option value="activo">ACTIVO</option>
-                                        <option value="inactivo">INACTIVO</option>
-                                    </select>
-                                </td>
-                           </tr>
-                       </tbody>
-                       <tbody>
+                            </tr>
+                        </tbody>
+                        <tbody>
                             <tr>
-                                <td colSpan={10}>
-                                    <div role="group" aria-label="Basic mixed styles example">
-                                        {
-                                            editar === true ?
-                                                <>
-                                                    <button onClick={actualizarAlumno} className="btn btn-warning"> Actualizar </button>
-                                                    <button onClick={cancelarAlumno} className="btn btn-secondary"> Cancelar </button>
-                                                </> :
-                                                <button onClick={agregarAlumno} className="btn btn-success"> Agregar </button>
-                                        }
+                                <td colSpan={7}>
+                                    <div>
+                                        {editar ? (
+                                            <>
+                                                <button onClick={actualizarAlumno} className="btn btn-warning">Actualizar</button>
+                                                <button onClick={limpiarFormulario} className="btn btn-secondary ms-2">Cancelar</button>
+                                            </>
+                                        ) : (
+                                            <button onClick={agregarAlumno} className="btn btn-success">Agregar</button>
+                                        )}
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </section>
-                <section >
+                <section>
                     <table className="table table-dark">
                         <thead>
                             <tr>
-                                <th scope="col"> DNI </th>
-                                <th scope="col"> Nombre </th>
-                                <th scope="col"> Apellido </th>
-                                <th scope="col"> Celular_Apoderado </th>
-                                <th scope="col"> Género </th>
-                                <th scope="col"> Nivel </th>
-                                <th scope="col"> Grado </th>
-                                <th scope="col"> Rol </th>
-                                <th scope="col"> Estado </th>
-                                <th scope="col"> Acciones </th>
+                                <th scope="col">DNI</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Apellido</th>
+                                <th scope="col">Cel. Apoderado</th>
+                                <th scope="col">Género</th>
+                                <th scope="col">Grado</th>
+                                <th scope="col">Año</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -339,17 +223,14 @@ function ComponenteAlumnos() {
                                     <td>{alumno.apellido}</td>
                                     <td>{alumno.celularApoderado}</td>
                                     <td>{alumno.genero}</td>
-                                    <td>{alumno.nivel}</td>
-                                    <td>{alumno.grado}</td>
-                                    <td>{alumno.user.rol}</td>
-                                    <td style={{ color: alumno.estado === 'activo' ? 'green' : 'red' }}>
-                                        {alumno.estado === 'activo' ? "🟢" : "🔴"}
-                                    </td>
+                                    <td>{alumno.nombreGrado}</td>
+                                    <td>{alumno.anio}</td>
+                                    <td style={{ color: alumno.estado === 'ACTIVO' ? 'green' : 'red' }}>{alumno.estado === 'ACTIVO' ? "🟢" : "🔴"}</td>
                                     <td>
-                                        <div className="btn-group" role="group" aria-label="Basic mixed styles example">
-                                            <button onClick={() => { eliminarAlumno(alumno.dni) }} type="button" className="btn btn-danger"> Eliminar </button>
-                                            <button onClick={() => { editarAlumno(alumno) }} type="button" className="btn btn-success"> Editar Datos </button>
-                                            <button onClick={() => { editarPasswordAlumno(alumno) }} type="button" className="btn btn-warning"> Cambiar Contraseña </button>
+                                        <div className="btn-group">
+                                            <button onClick={() => eliminarAlumno(alumno.dni)} className="btn btn-danger">Eliminar</button>
+                                            <button onClick={() => editarAlumno(alumno)} className="btn btn-success">Editar</button>
+                                            <button onClick={() => editarPasswordAlumno(alumno)} className="btn btn-warning">Contraseña</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -363,7 +244,7 @@ function ComponenteAlumnos() {
                     show={modalPasswordOpen}
                     onClose={() => setModalPasswordOpen(false)}
                     alumno={selectedAlumno}
-                    fetchListarUsuarios={fetchListarAlumno}
+                    fetchListarUsuarios={fetchListarAlumnos}
                     dni={selectedAlumno ? selectedAlumno.dni : null}
                     tipoUsuario="alumno"
                 />

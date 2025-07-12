@@ -10,7 +10,6 @@ function ComponenteAdministradores() {
     const [apellido, setApellido] = useState("");
     const [celular, setCelular] = useState("");
     const [estado, setEstado] = useState("");
-    const [rol, setRol] = useState("");
     const [clave, setClave] = useState("");
     const [mostrarClave, setMostrarClave] = useState(false);
     const [editar, setEditar] = useState(false);
@@ -34,13 +33,8 @@ function ComponenteAdministradores() {
     }
 
     const agregarAdministrador = () => {
-    if (!dniUsuario || !nombre || !apellido || !celular || !estado || !rol || !clave) {
+    if (!dniUsuario || !nombre || !apellido || !celular || !clave) {
       setError('Por favor, complete todos los campos.');
-      return;
-    }
-
-    if (estado === '' || rol === '') {
-      setError('Por favor, seleccione un estado y un rol.');
       return;
     }
 
@@ -49,9 +43,7 @@ function ComponenteAdministradores() {
       nombre: nombre,
       apellido: apellido,
       celular: celular,
-      rol: rol,
       clave: clave,
-      estado: estado,
     })
     .then(() => {
       fetchListarAdministrador();
@@ -60,7 +52,6 @@ function ComponenteAdministradores() {
       setApellido("");
       setCelular("");
       setEstado("");
-      setRol("");
       setClave("");
       Swal.fire({
         title: '¡Enhorabuena!',
@@ -117,12 +108,11 @@ function ComponenteAdministradores() {
         setApellido(Administrador.apellido);
         setCelular(Administrador.celular);
         setEstado(Administrador.estado);
-        setRol(Administrador.rol);
         setClave(Administrador.clave);
         setError('');
     }
     const actualizarAdministrador = () => {
-        if (!dniUsuario || !nombre || !apellido || !celular || !estado || !rol) {
+        if (!dniUsuario || !nombre || !apellido || !celular || !estado) {
             setError('Por favor, complete todos los campos.');
             return;
         }
@@ -132,10 +122,7 @@ function ComponenteAdministradores() {
             nombre: nombre,
             apellido: apellido,
             celular: celular,
-            estado: estado,
-            user: {
-                rol: rol
-            }
+            estado: estado
         }).then(() => {
             setEditar(false);
             fetchListarAdministrador();
@@ -143,7 +130,6 @@ function ComponenteAdministradores() {
             setNombre("");
             setApellido("");
             setCelular("");
-            setRol("");
             setEstado("");
             setClave("");
             Swal.fire({
@@ -163,7 +149,6 @@ function ComponenteAdministradores() {
         setNombre("");
         setApellido("");
         setCelular("");
-        setRol("");
         setEstado("");
         setClave("");
         setError('');
@@ -179,6 +164,8 @@ function ComponenteAdministradores() {
         setError('');
     };
 
+    const isFormDirty = dniUsuario || nombre || apellido || celular || clave;
+
     return (
         <>
       <ComponentePanelAdmin />
@@ -193,69 +180,67 @@ function ComponenteAdministradores() {
                                 <th scope="col"> Nombre </th>
                                 <th scope="col"> Apellido </th>
                                 <th scope="col"> Celular </th>
-                                <th scope="col"> Rol </th>
-                                {editar ? null : (<th scope="col"> Contraseña </th>)}
-                                <th scope="col"> Estado </th>
+                                {editar ? <th scope="col">Estado</th> : <th scope="col">Contraseña</th>}
                             </tr>
                         </thead>
                         <tbody>
                             <tr className="table-success">
                                 <td>
-                                    <input type="text" value={dniUsuario} onChange={(e) => setDniUsuario(e.target.value)} placeholder="DNI"/>
+                                    <input type="text" value={dniUsuario} onChange={(e) => setDniUsuario(e.target.value.replace(/[^0-9]/g, ''))} placeholder="DNI" disabled={editar} maxLength="8" pattern="\d{8}" title="El DNI debe contener 8 dígitos numéricos."/>
                                 </td>
                                 <td>
-                                    <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Nombre"/>
+                                    <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value.replace(/[^a-zA-Z\s]/g, ''))} placeholder="Nombre" pattern="[A-Za-z\s]+" title="El nombre solo debe contener letras."/>
                                 </td>
                                 <td>
-                                    <input type="text" value={apellido} onChange={(e) => setApellido(e.target.value)} placeholder="Apellido"/>
+                                    <input type="text" value={apellido} onChange={(e) => setApellido(e.target.value.replace(/[^a-zA-Z\s]/g, ''))} placeholder="Apellido" pattern="[A-Za-z\s]+" title="El apellido solo debe contener letras."/>
                                 </td>
                                 <td>
-                                    <input type="text" value={celular} onChange={(e) => setCelular(e.target.value)} placeholder="Celular"/>
+                                    <input type="text" value={celular} onChange={(e) => setCelular(e.target.value.replace(/[^0-9]/g, ''))} placeholder="Celular" maxLength="9" pattern="\d{9}" title="El celular debe contener 9 dígitos numéricos."/>
                                 </td>
-                                <td>
-                                    <select className="w-100" value={rol} onChange={(e) => setRol(e.target.value)} placeholder="Rol">
-                                        <option value="">Seleccionar Rol</option>
-                                        <option value="ADMINISTRADOR">ADMINISTRADOR</option>
-                                    </select>
-                                </td>
-                                {editar ? null : (
+                                {editar ? (
+                                    <td>
+                                        <select value={estado} onChange={(e) => setEstado(e.target.value)}>
+                                            <option value="">Seleccionar Estado</option>
+                                            <option value="ACTIVO">ACTIVO</option>
+                                            <option value="INACTIVO">INACTIVO</option>
+                                        </select>
+                                    </td>
+                                ) : (
                                     <td className="password-container">
-                                        <>
-                                            <input
-                                                type={mostrarClave ? "text" : "password"}
-                                                value={clave}
-                                                onChange={(e) => setClave(e.target.value)}
-                                                placeholder="Contraseña"
-                                            />
-                                            <span
-                                                className="password-toggle"
-                                                onClick={() => setMostrarClave(!mostrarClave)}
-                                            >
-                                                {mostrarClave ? "👁️" : "👁️‍🗨️"}
-                                            </span>
-                                        </>
+                                        <input
+                                            type={mostrarClave ? "text" : "password"}
+                                            value={clave}
+                                            onChange={(e) => setClave(e.target.value)}
+                                            placeholder="Contraseña"
+                                        />
+                                        <span
+                                            className="password-toggle-admin"
+                                            onClick={() => setMostrarClave(!mostrarClave)}
+                                        >
+                                            {mostrarClave ? "👁️" : "👁️‍🗨️"}
+                                        </span>
                                     </td>
                                 )}
-                                <td>
-                                    <select value={estado} onChange={(e) => setEstado(e.target.value)} placeholder="Estado">
-                                        <option value="">Seleccionar Estado</option>
-                                        <option value="ACTIVO">ACTIVO</option>
-                                        <option value="INACTIVO">INACTIVO</option>
-                                    </select>
-                                </td>
                             </tr>
                         </tbody>
                         <tbody>
                             <tr>
-                                <td colSpan={7}>
+                                <td colSpan={6}>
                                     <div role="group" aria-label="Basic mixed styles example">
                                         {
-                                            editar === true ?
-                                            <>
-                                                <button onClick={actualizarAdministrador} className="btn btn-warning"> Actualizar </button>
-                                                <button onClick={cancelarAdministrador} className="btn btn-secondary"> Cancelar </button>
-                                            </> :
-                                            <button onClick={agregarAdministrador} className="btn btn-success"> Agregar </button>
+                                            editar ? (
+                                               <>
+                                                   <button onClick={actualizarAdministrador} className="btn btn-warning"> Actualizar </button>
+                                                   <button onClick={cancelarAdministrador} className="btn btn-secondary ms-2"> Cancelar </button>
+                                               </>
+                                            ) : (
+                                               <>
+                                                   <button onClick={agregarAdministrador} className="btn btn-success"> Agregar </button>
+                                                   {isFormDirty && (
+                                                       <button onClick={cancelarAdministrador} className="btn btn-secondary ms-2"> Cancelar </button>
+                                                   )}
+                                               </>
+                                            )
                                         }
                                     </div>
                                 </td>
@@ -271,8 +256,7 @@ function ComponenteAdministradores() {
                                 <th scope="col"> Nombre </th>
                                 <th scope="col"> Apellido </th>
                                 <th scope="col"> Celular </th>
-                                <th scope="col"> Rol </th>
-                                <th scope="col"> Contraseña </th>
+                                <th scope="col"> Año </th>
                                 <th scope="col"> Estado </th>
                                 <th scope="col"> Acciones </th>
                             </tr>
@@ -285,8 +269,7 @@ function ComponenteAdministradores() {
                                         <td>{Administrador.nombre}</td>
                                         <td>{Administrador.apellido}</td>
                                         <td>{Administrador.celular}</td>
-                                        <td>{Administrador.user.rol}</td>
-                                        <td>********</td>
+                                        <td>{Administrador.anio}</td>
                                         <td style={{ color: Administrador.estado === 'ACTIVO' ? 'green' : 'red' }}>
                                            {Administrador.estado === 'ACTIVO' ? "🟢" : "🔴"}
                                         </td>
@@ -301,7 +284,7 @@ function ComponenteAdministradores() {
                                     ))
                                 ) : (
                                     <tr>
-                                    <td colSpan={8}>No se pudo cargar la lista de administradores.</td>
+                                    <td colSpan={7}>No se pudo cargar la lista de administradores.</td>
                                     </tr>
                                 )}
                         </tbody>

@@ -47,6 +47,8 @@ function ComponenteUpdatePassword({ fetchListarUsuarios, dni,nombre, apellido, o
         title: '¡Enhorabuena!',
         text: '¡Contraseña actualizada con éxito!',
         icon: 'success',
+      }).then(() => {
+        onClose();
       });
     } catch (error) {
       console.error('Error al actualizar la contraseña:', error);

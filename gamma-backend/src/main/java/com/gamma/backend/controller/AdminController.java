@@ -41,9 +41,10 @@ public class AdminController {
         List<Administrador> administradores = administradorRepository.findByAnioEscolarIn(aniosActivos);
 
         for (Administrador administrador : administradores) {
-            if (administrador.getUser() != null) {
+            if (administrador.getUser() != null && administrador.getAnioEscolar() != null) {
                 administrador.setRol(administrador.getUser().getRol());
                 administrador.setClave(administrador.getUser().getClave());
+                administrador.setAnio(administrador.getAnioEscolar().getAnio());
             }
         }
 
@@ -91,15 +92,13 @@ public class AdminController {
         String nombre = payload.get("nombre");
         String apellido = payload.get("apellido");
         String celular = payload.get("celular");
-        String rol = payload.get("rol");
         String clave = payload.get("clave");
-        String estado = payload.get("estado");
 
         // Crear el usuario
         User user = new User();
         user.setDni(dni);
         user.setClave(clave);
-        user.setRol(rol);
+        user.setRol("ADMINISTRADOR");
         userRepository.save(user);
 
         // Crear el administrador
@@ -113,7 +112,7 @@ public class AdminController {
         .orElseThrow(() -> new RuntimeException("No hay año escolar activo"));
 
         administrador.setAnioEscolar(anioEscolar);
-        administrador.setEstado(estado);
+        administrador.setEstado("ACTIVO");
         administradorRepository.save(administrador);
         logger.info("Administrador con DNI {} agregado.", dni);
 

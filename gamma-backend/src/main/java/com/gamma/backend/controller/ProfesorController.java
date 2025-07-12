@@ -1,9 +1,11 @@
 package com.gamma.backend.controller;
 
 import com.gamma.backend.model.Profesor;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.ProfesorRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +30,18 @@ public class ProfesorController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AnioEscolarService anioEscolarService;
+
     @GetMapping("/profesor/list")
     public ResponseEntity<List<Profesor>> listarProfesores() {
         List<Profesor> profesores = profesorRepository.findAll();
         for (Profesor profesor : profesores) {
-            if (profesor.getUser() != null && profesor.getCurso() != null) {
-                profesor.setCodigoCurso(profesor.getCurso().getCodigoCurso());
+            if (profesor.getUser() != null && profesor.getCurso() != null && profesor.getAnioEscolar() != null) {
+                profesor.setCodigoCurso(profesor.getCurso().getNombre());
                 profesor.setRol(profesor.getUser().getRol());
                 profesor.setClave(profesor.getUser().getClave());
+                profesor.setAnio(profesor.getAnioEscolar().getAnio());
             }
         }
         logger.info("Listado de profesores solicitado.");
@@ -85,27 +91,34 @@ public class ProfesorController {
         String nombre = payload.get("nombre");
         String apellido = payload.get("apellido");
         String celular = payload.get("celular");
-        String cursoId = payload.get("curso");
-        String rol = payload.get("rol");
+        String codigoCurso = payload.get("curso");
         String clave = payload.get("clave");
-        String estado = payload.get("estado");
 
-        // Crear el usuario
+        if (userRepository.existsById(dni)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Ya existe un usuario con el DNI " + dni));
+        }
+
         User user = new User();
         user.setDni(dni);
         user.setClave(clave);
-        user.setRol(rol);
+        user.setRol("PROFESOR");
         userRepository.save(user);
 
-        // Crear el profesor
         Profesor profesor = new Profesor();
         profesor.setDni(dni);
         profesor.setNombre(nombre);
         profesor.setApellido(apellido);
-        Curso curso = cursoRepository.findById(cursoId).orElse(null);
-        profesor.setCurso(curso);
         profesor.setCelular(celular);
-        profesor.setEstado(estado);
+        profesor.setEstado("ACTIVO");
+
+        Curso curso = cursoRepository.findById(codigoCurso)
+                .orElseThrow(() -> new RuntimeException("Curso no encontrado con código: " + codigoCurso));
+        profesor.setCurso(curso);
+
+        AnioEscolar anioEscolar = anioEscolarService.obtenerAnioActivo()
+                .orElseThrow(() -> new RuntimeException("No hay año escolar activo"));
+        profesor.setAnioEscolar(anioEscolar);
+
         profesorRepository.save(profesor);
         logger.info("Profesor con DNI {} agregado.", dni);
 
