@@ -31,7 +31,8 @@ function ComponenteLogin() {
 
             console.log("Respuesta del backend:", data);
 
-            if (response.ok) {
+            if (response.ok && (data.rol === "ADMINISTRADOR" || data.rol === "PROFESOR")) {
+               
                 Swal.fire({
                     title: '¡Bienvenido!',
                     text: '¡Credenciales Correctas!',
@@ -41,28 +42,31 @@ function ComponenteLogin() {
                 if (data.rol === "PROFESOR") {
                     const codigoCursoResponse = await fetch(`http://localhost:8080/profesor/codigo_curso?dni=${idUsuario}`);
                     const codigoCursoData = await codigoCursoResponse.json();
-                    console.log("Respuesta del backend para codigo_curso:", codigoCursoData);
                     auth.iniciarSesion({ Rol: data.rol, Clave: data.clave, CodigoCurso: codigoCursoData.codigo_curso });
                 } else {
                     auth.iniciarSesion({ Rol: data.rol, Clave: data.clave });
                 }
 
-                // Redirigir al panel correspondiente según el rol
                 if (data.rol === "ADMINISTRADOR") {
                     navigate('/panel/listaalumnos');
                 } else if (data.rol === "PROFESOR") {
                     navigate('/panel/listanotas');
-                } else {
-                    navigate('/inicio');
                 }
-            } else {
-                console.log("Error en la autenticación:", data);
+             } else {
+                let title = '¡Error!';
+                let text = '¡Credenciales Incorrectas!';
+                if (response.ok && data.rol === "ALUMNO") {
+                    title = '¡Acceso Denegado!';
+                    text = 'Los alumnos no tienen permitido el acceso aquí.';
+                }
                 Swal.fire({
-                    title: '¡Error!',
-                    text: '¡Credenciales Incorrectas!',
+                    title: title,
+                    text: text,
                     icon: 'error',
                 });
-            }
+                setClave("");
+                setIdUsuario("");
+             }
         } catch (error) {
             console.error('Error al conectar con el backend:', error);
             Swal.fire({
@@ -70,6 +74,8 @@ function ComponenteLogin() {
                 text: '¡Error al conectar con el backend!',
                 icon: 'error',
             });
+            setClave("");
+            setIdUsuario("");
         }
     };
 

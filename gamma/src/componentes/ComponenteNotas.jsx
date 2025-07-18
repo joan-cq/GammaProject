@@ -45,6 +45,8 @@ function ComponenteNotas() {
                     icon: 'error',
                 });
             }
+            setDni('');
+            setPassword('');
         } catch (err) {
             setError('Error al conectar con el servidor.');
             console.error(err);
@@ -53,6 +55,8 @@ function ComponenteNotas() {
                 text: 'No se pudo conectar con el servidor. Inténtalo más tarde.',
                 icon: 'error',
             });
+            setDni('');
+            setPassword('');
         }
     };
 
@@ -237,6 +241,7 @@ function ComponenteNotas() {
                 <h2>Bienvenido, {alumno.nombre} {alumno.apellido}</h2>
                 {grado && <h3>{grado.nombreGrado} - {grado.nivel}</h3>}
                 <h4>Año Escolar: {anioActivo}</h4>
+                <button onClick={() => setAlumno(null)} className="btn btn-danger">Cerrar Sesión</button>
             </div>
 
             {!mostrarTodas && (
