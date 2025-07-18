@@ -102,4 +102,21 @@ public class NotaController {
 
         return ResponseEntity.ok(Map.of("mensaje", "Nota actualizada correctamente"));
     }
+
+    @GetMapping("/notas/alumno/{dni}")
+    public ResponseEntity<List<Map<String, Object>>> obtenerNotasPorAlumno(@PathVariable String dni) {
+        logger.info("Obteniendo todas las notas para el alumno con DNI {}", dni);
+        List<Nota> notas = notaRepository.findAllByAlumno_Dni(dni);
+
+        List<Map<String, Object>> notasResponse = notas.stream().map(nota -> {
+            Map<String, Object> notaMap = new HashMap<>();
+            notaMap.put("id", nota.getId());
+            notaMap.put("nota", nota.getNota());
+            notaMap.put("curso", nota.getCurso().getNombre());
+            notaMap.put("bimestre", nota.getBimestre().getId());
+            return notaMap;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(notasResponse);
+    }
 }

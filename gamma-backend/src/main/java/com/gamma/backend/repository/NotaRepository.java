@@ -17,4 +17,5 @@ public interface NotaRepository extends JpaRepository<Nota, Long> {
     Optional<Nota> findByAlumnoAndBimestre(Alumno alumno, Bimestre bimestre);
 
     Nota findByAlumno_DniAndCurso_CodigoCursoAndBimestre_Id(String alumnoDni, String codigoCurso, Integer bimestreId);
+    List<Nota> findAllByAlumno_Dni(String alumnoDni);
 }

@@ -82,7 +82,7 @@ function ComponenteLogin() {
                     <form method="POST">
                         <input  type="text" name="dni" value={idUsuario} onChange={(e) => setIdUsuario(e.target.value)} placeholder="Ingresa tu DNI:" required={true} id="idUsuario" />
                         <input  type="password" value={clave} onChange={(e) => setClave(e.target.value)} name="clave" placeholder="Ingresa tu contraseña:" required={true} id="password" />
-                        <input type="button" value="Ingresar" onClick={fetchCredenciales} id="submit"/>
+                        <input  type="button" value="Ingresar" onClick={fetchCredenciales} id="submit"/>
                     </form>
                 </div>
             </section>

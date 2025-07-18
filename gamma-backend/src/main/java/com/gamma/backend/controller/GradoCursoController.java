@@ -1,6 +1,7 @@
 package com.gamma.backend.controller;
 
 import com.gamma.backend.model.AnioEscolar;
+import com.gamma.backend.model.Curso;
 import com.gamma.backend.model.Grado;
 import com.gamma.backend.model.GradoCurso;
 import com.gamma.backend.repository.GradoCursoRepository;
@@ -41,5 +42,20 @@ public class GradoCursoController {
         logger.info("Relaciones encontradas: {}", relaciones);
         logger.info("Saliendo del método listarGradosPorCurso");
         return relaciones.stream().map(GradoCurso::getGrado).toList();
+    }
+    @GetMapping("/cursos/{codigoGrado}")
+    public List<Curso> listarCursosPorGrado(@PathVariable String codigoGrado) {
+        logger.info("Entrando al método listarCursosPorGrado con codigoGrado: {}", codigoGrado);
+        AnioEscolar anioActivo = anioEscolarService.obtenerAnioActivo().orElse(null);
+        if (anioActivo == null) {
+            logger.warn("No hay año escolar activo.");
+            return List.of();
+        }
+        logger.info("Anio activo: {}", anioActivo.getId());
+        List<GradoCurso> relaciones = gradoCursoRepository.findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(
+            codigoGrado, anioActivo.getId(), "ACTIVO"
+        );
+        logger.info("Relaciones encontradas: {}", relaciones.size());
+        return relaciones.stream().map(GradoCurso::getCurso).toList();
     }
 }

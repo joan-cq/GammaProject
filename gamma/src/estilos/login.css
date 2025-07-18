@@ -11,3 +11,7 @@
     border: 1px solid #ddd;
     border-radius: 5px;
 }
+
+.login.loginAdmin .login-form input[type="button"]:hover {
+    background-color: #7a000f; /* Un rojo más oscuro */
+}
