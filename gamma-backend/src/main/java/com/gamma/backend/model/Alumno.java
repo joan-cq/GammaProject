@@ -1,5 +1,7 @@
 package com.gamma.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,12 +33,17 @@ public class Alumno {
     @Column(name = "genero")
     private String genero;
 
-    @Column(name = "codigo_grado")
-    private String codigoGrado;
+    @ManyToOne
+    @JoinColumn(name = "codigo_grado")
+    @JsonBackReference
+    private Grado grado;
 
     @ManyToOne
-    @JoinColumn(name = "id_anio")
+    @JoinColumn(name = "id_anio", referencedColumnName = "id_anio")
     private AnioEscolar anioEscolar;
+
+    @Transient
+    private int anio;
 
     @Column(name = "estado")
     private String estado;
@@ -58,6 +65,11 @@ public class Alumno {
     }
 
     public String getCodigoGrado() {
-        return codigoGrado;
+        return this.grado.getCodigoGrado();
     }
+
+    public void setCodigoGrado(String codigoGrado) {
+        this.grado.setCodigoGrado(codigoGrado);
+    }
+
 }

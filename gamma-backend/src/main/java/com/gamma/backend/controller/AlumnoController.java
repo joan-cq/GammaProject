@@ -1,9 +1,7 @@
 package com.gamma.backend.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import com.gamma.backend.model.Alumno;
+import com.gamma.backend.model.Grado;
 import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AlumnoRepository;
@@ -13,7 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import com.gamma.backend.model.Curso;
+import com.gamma.backend.repository.CursoRepository;
+import com.gamma.backend.repository.GradoRepository;
+
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class AlumnoController {
@@ -21,6 +26,9 @@ public class AlumnoController {
 
     @Autowired
     private AlumnoRepository alumnoRepository;
+
+    @Autowired
+    private GradoRepository gradoRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -32,9 +40,11 @@ public class AlumnoController {
     public ResponseEntity<List<Alumno>> listarAlumnos() {
         List<Alumno> alumnos = alumnoRepository.findAll();
         for (Alumno alumno : alumnos) {
-            if (alumno.getUser() != null) {
+            if (alumno.getUser() != null && alumno.getGrado() != null && alumno.getAnioEscolar() != null) {
+                alumno.setCodigoGrado(alumno.getGrado().getCodigoGrado());
                 alumno.setRol(alumno.getUser().getRol());
                 alumno.setClave(alumno.getUser().getClave());
+                alumno.setAnio(alumno.getAnioEscolar().getAnio());
             }
         }
         logger.info("Listado de alumnos solicitado.");
@@ -42,35 +52,38 @@ public class AlumnoController {
     }
 
     @PutMapping("/alumno/update")
-    public ResponseEntity<Alumno> actualizarAlumno(@RequestBody Alumno Alumno) {
-        // Obtener el Alumno existente de la base de datos
-        Alumno AlumnoExistente = alumnoRepository.findById(Alumno.getDni()).orElse(null);
+    public ResponseEntity<Alumno> actualizarAlumno(@RequestBody Map<String, Object> payload) {
+        String dni = (String) payload.get("dni");
+        String nombre = (String) payload.get("nombre");
+        String apellido = (String) payload.get("apellido");
+        String celular = (String) payload.get("celularApoderado");
+        String gradoId = (String) payload.get("codigoGrado");
+        String estado = (String) payload.get("estado");
+        String rol = (String) payload.get("rol");
 
-        if (AlumnoExistente != null) {
-            // Actualizar los atributos del Alumno existente
-            AlumnoExistente.setNombre(Alumno.getNombre());
-            AlumnoExistente.setApellido(Alumno.getApellido());
-            AlumnoExistente.setCelularApoderado(Alumno.getCelularApoderado());
-            AlumnoExistente.setGenero(Alumno.getGenero());
-            AlumnoExistente.setEstado(Alumno.getEstado());
+        // Obtener el alumno existente de la base de datos
+        Alumno alumnoExistente = alumnoRepository.findById(dni).orElse(null);
 
-            // Obtener el usuario asociado al Alumno
-            User user = Alumno.getUser();
-
-            // Actualizar el atributo rol en el usuario si no es nulo
-            if (user != null) {
-                if (AlumnoExistente.getUser() != null) {
-                    AlumnoExistente.getUser().setRol(user.getRol());
-                    userRepository.save(AlumnoExistente.getUser());
-                } else {
-                }
+        if (alumnoExistente != null) {
+            // Actualizar los atributos del alumno existente
+            alumnoExistente.setNombre(nombre);
+            alumnoExistente.setApellido(apellido);
+            alumnoExistente.setCelularApoderado(celular);
+            if (gradoId != null) {
+                Grado grado = gradoRepository.findById(gradoId).orElse(null);
+                alumnoExistente.setGrado(grado);
+            }
+            alumnoExistente.setEstado(estado);
+            if (rol != null && alumnoExistente.getUser() != null) {
+                alumnoExistente.getUser().setRol(rol);
+                userRepository.save(alumnoExistente.getUser());
             }
 
-            Alumno AlumnoActualizado = alumnoRepository.save(AlumnoExistente);
-            logger.info("Alumno con DNI {} actualizado.", Alumno.getDni());
-            return ResponseEntity.ok(AlumnoActualizado);
+            Alumno alumnoActualizado = alumnoRepository.save(alumnoExistente);
+            logger.info("Alumno con DNI {} actualizado.", dni);
+            return ResponseEntity.ok(alumnoActualizado);
         } else {
-            logger.warn("Intento de actualizar alumno con DNI {} que no existe.", Alumno.getDni());
+            logger.warn("Intento de actualizar alumno con DNI {} que no existe.", dni);
             return ResponseEntity.notFound().build();
         }
     }
@@ -80,28 +93,39 @@ public class AlumnoController {
         String dni = payload.get("dni");
         String nombre = payload.get("nombre");
         String apellido = payload.get("apellido");
-        String celularApoderado = payload.get("celularApoderado");
-        String rol = payload.get("rol");
-        String clave = payload.get("clave");
-        String estado = payload.get("estado");
+        String celular = payload.get("celularApoderado");
         String genero = payload.get("genero");
+        String codigoGrado = payload.get("codigoGrado");
+        String clave = payload.get("clave");
 
-        // Crear el usuario
+        if (userRepository.existsById(dni)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Ya existe un usuario con el DNI " + dni));
+        }
+
         User user = new User();
         user.setDni(dni);
         user.setClave(clave);
-        user.setRol(rol);
+        user.setRol("ALUMNO");
         userRepository.save(user);
 
-        // Crear el Alumno
-        Alumno Alumno = new Alumno();
-        Alumno.setDni(dni);
-        Alumno.setNombre(nombre);
-        Alumno.setApellido(apellido);
-        Alumno.setCelularApoderado(celularApoderado);
-        Alumno.setEstado(estado);
-        Alumno.setGenero(genero);
-        alumnoRepository.save(Alumno);
+        Alumno alumno = new Alumno();
+        alumno.setDni(dni);
+        alumno.setNombre(nombre);
+        alumno.setApellido(apellido);
+        alumno.setCelularApoderado(celular);
+        alumno.setGenero(genero);
+
+        Grado grado = gradoRepository.findById(codigoGrado)
+                .orElseThrow(() -> new RuntimeException("Grado no encontrado con código: " + codigoGrado));
+        alumno.setGrado(grado);
+
+        alumno.setEstado("ACTIVO");
+
+        AnioEscolar anioEscolar = anioEscolarService.obtenerAnioActivo()
+                .orElseThrow(() -> new RuntimeException("No hay año escolar activo"));
+        alumno.setAnioEscolar(anioEscolar);
+
+        alumnoRepository.save(alumno);
         logger.info("Alumno con DNI {} agregado.", dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Alumno agregado con éxito"));
@@ -109,15 +133,15 @@ public class AlumnoController {
 
     @DeleteMapping("/alumno/delete/{dni}")
     public ResponseEntity<?> eliminarAlumno(@PathVariable String dni) {
-        // Primero, buscar el Alumno por DNI
-        Alumno Alumno = alumnoRepository.findById(dni).orElse(null);
+        // Primero, buscar el alumno por DNI
+        Alumno alumno = alumnoRepository.findById(dni).orElse(null);
 
-        if (Alumno != null) {
-            // Eliminar el Alumno de la tabla Alumno
+        if (alumno != null) {
+            // Eliminar el alumno de la tabla Alumno
             alumnoRepository.deleteById(dni);
 
-            // Obtener el usuario asociado al Alumno
-            User user = Alumno.getUser();
+            // Obtener el usuario asociado al alumno
+            User user = alumno.getUser();
 
             if (user != null) {
                 // Eliminar el usuario de la tabla User
@@ -137,12 +161,12 @@ public class AlumnoController {
         // Obtener la nueva contraseña del payload
         String nuevaClave = payload.get("nuevaClave");
 
-        // Obtener el Alumno existente de la base de datos
-        Alumno AlumnoExistente = alumnoRepository.findById(dni).orElse(null);
+        // Obtener el alumno existente de la base de datos
+        Alumno alumnoExistente = alumnoRepository.findById(dni).orElse(null);
 
-        if (AlumnoExistente != null) {
-            // Obtener el usuario asociado al Alumno
-            User user = AlumnoExistente.getUser();
+        if (alumnoExistente != null) {
+            // Obtener el usuario asociado al alumno
+            User user = alumnoExistente.getUser();
 
             if (user != null) {
                 // Actualizar la contraseña del usuario
@@ -156,6 +180,18 @@ public class AlumnoController {
             }
         } else {
             logger.warn("Intento de actualizar contraseña del alumno con DNI {} que no existe.", dni);
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @Autowired
+    private com.gamma.backend.service.modelservice.AlumnoService alumnoService;
+
+    @GetMapping("/alumno/codigo_curso")
+    public ResponseEntity<?> obtenerCodigoCurso(@RequestParam String dni) {
+        String codigoCurso = alumnoService.obtenerCodigoGradoPorDni(dni);
+        if (codigoCurso != null) {
+            return ResponseEntity.ok(Map.of("codigo_curso", codigoCurso));
+        } else {
             return ResponseEntity.notFound().build();
         }
     }

@@ -20,4 +20,5 @@ public class Grado {
 
     @Column(nullable = false)
     private String nivel;
+
 }

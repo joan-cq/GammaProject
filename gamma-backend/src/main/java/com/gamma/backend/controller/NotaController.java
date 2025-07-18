@@ -48,7 +48,7 @@ public class NotaController {
 
         logger.info("Obteniendo alumnos para el grado {}, bimestre {} y curso {}", codigoGrado, idBimestre, codigoCurso);
 
-        List<Alumno> alumnos = alumnoRepository.findByCodigoGrado(codigoGrado);
+        List<Alumno> alumnos = alumnoRepository.findByGrado_CodigoGrado(codigoGrado);
 
         List<Map<String, Object>> alumnosConNotas = alumnos.stream().map(alumno -> {
             Nota nota = notaRepository.findByAlumno_DniAndCurso_CodigoCursoAndBimestre_Id(alumno.getDni(), codigoCurso, idBimestre);

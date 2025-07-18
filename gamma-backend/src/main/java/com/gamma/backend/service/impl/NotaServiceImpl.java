@@ -72,7 +72,7 @@ public class NotaServiceImpl implements NotaService {
         }
 
         List<GradoCurso> gradoCursos = gradoCursoRepository.findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(codigoGrado, anioActivo.getId(), "ACTIVO");
-        List<Alumno> alumnos = alumnoRepository.findByCodigoGrado(codigoGrado);
+        List<Alumno> alumnos = alumnoRepository.findByGrado_CodigoGrado(codigoGrado);
         List<Nota> notas = new ArrayList<>();
 
         for (Alumno alumno : alumnos) {

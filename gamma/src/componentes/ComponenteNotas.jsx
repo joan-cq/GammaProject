@@ -45,64 +45,7 @@ function ComponenteNotas () {
                     </form>
                 </div>
             </section>
-            <section className={mostrarSeccion ? "seccionNotas" : "seccionOculta"}>
-                <div className="container contenedorDatosPersonales">
-                    <table className="table table-dark table-striped-columns">
-                        <thead>
-                            <tr>
-                                <th scope="col">DNI</th>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Apellido</th>
-                                <th scope="col">Fecha de Nacimiento</th>
-                                <th scope="col">Género</th>
-                                <th scope="col">Télefono Apoderado</th>
-                            </tr>
-                        </thead>
-                        {alumnoDatos.map((alumno) => (
-                            <tbody key={alumno.DNI}>
-                                <tr>
-                                    <td>{alumno.DNI}</td>
-                                    <td>{alumno.Nombre}</td>
-                                    <td>{alumno.Apellido}</td>
-                                    <td>
-                                        {new Date(alumno.FechaNacimiento).toLocaleDateString('es-PE', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric'
-                                        }).replace(/\//g, ' - ')}
-                                    </td>
-                                    <td>{alumno.Genero}</td>
-                                    <td>{alumno.TelefonoApoderado}</td>
-                                </tr> 
-                            </tbody>
-                        ))}
-                    </table>
-                </div>
-                <div className="container contenedor">
-                    <table className="table">
-                        <thead  className="table-danger">
-                            <tr>
-                                <th scope="col"> Cursos </th>
-                                <th scope="col"> Notas </th>
-                            </tr>
-                        </thead>
-                        {alumnoDatos.map((alumno) => (
-                            <tbody key={alumno.DNI}>
-                                {alumno.NombresCursos ? alumno.NombresCursos.split(',').map((curso, index) => (
-                                    <tr key={index} className="table-danger">
-                                        <td>{curso}</td>
-                                        <td>{alumno.Calificaciones.split(',')[index]}</td>
-                                    </tr>
-                                )) : (
-                                    <tr className="table-danger">
-                                        <td colSpan="2"> ¡Lastima, no hay cursos ni notas registradas! </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        ))}
-                    </table>
-                </div>
-            </section>
+            
         </>
     )
 
