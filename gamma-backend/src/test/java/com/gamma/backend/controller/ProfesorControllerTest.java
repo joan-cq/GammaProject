@@ -3,9 +3,12 @@ package com.gamma.backend.controller;
 import com.gamma.backend.model.Curso;
 import com.gamma.backend.model.Profesor;
 import com.gamma.backend.model.User;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.ProfesorRepository;
 import com.gamma.backend.repository.CursoRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.modelservice.AnioEscolarService;
+import com.gamma.backend.service.modelservice.ProfesorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -32,6 +35,12 @@ class ProfesorControllerTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AnioEscolarService anioEscolarService;
+
+    @Mock
+    private ProfesorService profesorService;
+
     @InjectMocks
     private ProfesorController profesorController;
 
@@ -44,6 +53,15 @@ class ProfesorControllerTest {
     @Test
     void listarProfesores_ReturnsOk() {
         // Arrange
+        AnioEscolar anioActivo = new AnioEscolar();
+        anioActivo.setId(1);
+        anioActivo.setAnio(2024);
+        anioActivo.setEstado("ACTIVO");
+
+        Curso curso = new Curso();
+        curso.setCodigoCurso("C001");
+        curso.setNombre("Matemáticas");
+
         Profesor profesor1 = new Profesor();
         profesor1.setDni("123");
         profesor1.setNombre("Profesor");
@@ -52,32 +70,19 @@ class ProfesorControllerTest {
         user1.setDni("123");
         user1.setRol("PROFESOR");
         profesor1.setUser(user1);
-        Curso curso1 = new Curso();
-        curso1.setCodigoCurso("MAT101");
-        profesor1.setCurso(curso1);
+        profesor1.setCurso(curso);
+        profesor1.setAnioEscolar(anioActivo);
 
-        Profesor profesor2 = new Profesor();
-        profesor2.setDni("456");
-        profesor2.setNombre("Profesor");
-        profesor2.setApellido("Dos");
-        User user2 = new User();
-        user2.setDni("456");
-        user2.setRol("PROFESOR");
-        profesor2.setUser(user2);
-        Curso curso2 = new Curso();
-        curso2.setCodigoCurso("FIS201");
-        profesor2.setCurso(curso2);
-
-        when(profesorRepository.findAll()).thenReturn(List.of(profesor1, profesor2));
+        when(profesorRepository.findAll()).thenReturn(List.of(profesor1));
 
         // Act
         ResponseEntity<List<Profesor>> response = profesorController.listarProfesores();
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
+        assertEquals(1, response.getBody().size());
         assertEquals("PROFESOR", response.getBody().get(0).getRol());
-        assertEquals("MAT101", response.getBody().get(0).getCodigoCurso());
+        assertEquals("Matemáticas", response.getBody().get(0).getCodigoCurso());
     }
 
     @SuppressWarnings("null")
@@ -114,11 +119,20 @@ class ProfesorControllerTest {
     @Test
     void agregarProfesor_ReturnsOk() {
         // Arrange
-        Map<String, String> payload = Map.of("dni", "123", "nombre", "Profesor", "apellido", "Uno", "celular", "123456789", "curso", "MAT101", "rol", "PROFESOR", "clave", "secreto", "estado", "activo");
-        Curso curso = new Curso();
-        curso.setCodigoCurso("MAT101");
+        AnioEscolar anioActivo = new AnioEscolar();
+        anioActivo.setId(1);
+        anioActivo.setAnio(2024);
+        anioActivo.setEstado("ACTIVO");
 
-        when(cursoRepository.findById("MAT101")).thenReturn(Optional.of(curso));
+        Curso curso = new Curso();
+        curso.setCodigoCurso("C001");
+        curso.setNombre("Matemáticas");
+
+        Map<String, String> payload = Map.of("dni", "123", "nombre", "Profesor", "apellido", "Uno", "celular", "123456789", "curso", "C001", "clave", "secreto");
+
+        when(userRepository.existsById("123")).thenReturn(false);
+        when(cursoRepository.findById("C001")).thenReturn(Optional.of(curso));
+        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
 
         // Act
         ResponseEntity<?> response = profesorController.agregarProfesor(payload);
@@ -172,5 +186,18 @@ class ProfesorControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(Map.of("mensaje", "Contraseña actualizada con éxito"), response.getBody());
+    }
+
+    @Test
+    void obtenerCodigoCurso_ReturnsOk() {
+        // Arrange
+        when(profesorService.obtenerCodigoCursoPorDni("123")).thenReturn("C001");
+
+        // Act
+        ResponseEntity<?> response = profesorController.obtenerCodigoCurso("123");
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(Map.of("codigo_curso", "C001"), response.getBody());
     }
 }

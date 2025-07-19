@@ -68,6 +68,33 @@ class AuthControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertEquals(Map.of("error", "Usuario inactivo"), response.getBody());
     }
+    @Test
+    void login_AnioInactivo_ReturnsForbidden() {
+        // Arrange
+        Map<String, String> credentials = Map.of("dni", "12345678", "clave", "secreto");
+        when(loginService.autenticar("12345678", "secreto")).thenReturn("ANIO_INACTIVO");
+
+        // Act
+        ResponseEntity<?> response = authController.login(credentials);
+
+        // Assert
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals(Map.of("error", "Usuario no pertenece al año activo"), response.getBody());
+    }
+
+    @Test
+    void login_NoAniosActivos_ReturnsServiceUnavailable() {
+        // Arrange
+        Map<String, String> credentials = Map.of("dni", "12345678", "clave", "secreto");
+        when(loginService.autenticar("12345678", "secreto")).thenReturn("NO_ANIOS_ACTIVOS");
+
+        // Act
+        ResponseEntity<?> response = authController.login(credentials);
+
+        // Assert
+        assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
+        assertEquals(Map.of("error", "No hay año escolar activo"), response.getBody());
+    }
 
     @Test
     void login_RolDesconocido_ReturnsForbidden() {

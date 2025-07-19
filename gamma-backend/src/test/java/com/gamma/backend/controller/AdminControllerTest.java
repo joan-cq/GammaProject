@@ -3,7 +3,9 @@ package com.gamma.backend.controller;
 import com.gamma.backend.model.Administrador;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AdministradorRepository;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,6 +29,9 @@ class AdminControllerTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AnioEscolarService anioEscolarService;
+
     @InjectMocks
     private AdminController adminController;
 
@@ -39,6 +44,11 @@ class AdminControllerTest {
     @Test
     void listarAdministradores_ReturnsOk() {
         // Arrange
+        AnioEscolar anioActivo = new AnioEscolar();
+        anioActivo.setId(1);
+        anioActivo.setAnio(2024);
+        anioActivo.setEstado("ACTIVO");
+
         Administrador admin1 = new Administrador();
         admin1.setDni("123");
         admin1.setNombre("Admin");
@@ -47,25 +57,19 @@ class AdminControllerTest {
         user1.setDni("123");
         user1.setRol("ADMINISTRADOR");
         admin1.setUser(user1);
+        admin1.setAnioEscolar(anioActivo);
 
-        Administrador admin2 = new Administrador();
-        admin2.setDni("456");
-        admin2.setNombre("Admin");
-        admin2.setApellido("Dos");
-        User user2 = new User();
-        user2.setDni("456");
-        user2.setRol("ADMINISTRADOR");
-        admin2.setUser(user2);
-
-        when(administradorRepository.findAll()).thenReturn(List.of(admin1, admin2));
+        when(anioEscolarService.obtenerAniosActivos()).thenReturn(List.of(anioActivo));
+        when(administradorRepository.findByAnioEscolarIn(List.of(anioActivo))).thenReturn(List.of(admin1));
 
         // Act
         ResponseEntity<List<Administrador>> response = adminController.listarAdministradores();
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
+        assertEquals(1, response.getBody().size());
         assertEquals("ADMINISTRADOR", response.getBody().get(0).getRol());
+
     }
 
     @SuppressWarnings("null")
@@ -95,7 +99,14 @@ class AdminControllerTest {
     @Test
     void agregarAdministrador_ReturnsOk() {
         // Arrange
-        Map<String, String> payload = Map.of("dni", "123", "nombre", "Admin", "apellido", "Uno", "celular", "123456789", "rol", "ADMINISTRADOR", "clave", "secreto", "estado", "activo");
+        AnioEscolar anioActivo = new AnioEscolar();
+        anioActivo.setId(1);
+        anioActivo.setAnio(2024);
+        anioActivo.setEstado("ACTIVO");
+
+        Map<String, String> payload = Map.of("dni", "123", "nombre", "Admin", "apellido", "Uno", "celular", "123456789", "clave", "secreto");
+
+        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
 
         // Act
         ResponseEntity<?> response = adminController.agregarAdministrador(payload);
