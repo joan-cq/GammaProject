@@ -1,6 +1,5 @@
 package com.gamma.backend.service.auth;
 
-import com.gamma.backend.model.Alumno;
 import com.gamma.backend.model.Profesor;
 import com.gamma.backend.repository.ProfesorRepository;
 import org.springframework.beans.factory.annotation.Autowired;

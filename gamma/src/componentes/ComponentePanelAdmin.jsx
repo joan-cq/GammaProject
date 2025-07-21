@@ -5,7 +5,6 @@ function ComponentePanel() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // Aquí puedes agregar la lógica de limpieza de sesión, como borrar tokens.
         navigate('/login');
     };
 

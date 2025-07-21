@@ -41,7 +41,7 @@ function ComponenteUpdatePassword({ fetchListarUsuarios, dni,nombre, apellido, o
         throw new Error('Error al actualizar la contraseña');
       }
 
-      // Después de actualizar la contraseña, puedes cerrar el modal y recargar la lista
+
       fetchListarUsuarios();
       Swal.fire({
         title: '¡Enhorabuena!',

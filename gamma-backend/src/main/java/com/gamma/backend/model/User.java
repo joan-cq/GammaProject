@@ -16,7 +16,7 @@ public class User {
     private String dni;  // La PK de la que parten los tipos de usuarios
 
     @Column(name = "clave", nullable = false)
-    private String clave;  // Para encryptar : aun pendiente (puede ser Bcrypt)
+    private String clave;  // usando Bcrypt
 
     @Column(name = "rol", nullable = false)
     private String rol;    // ADMINISTRADOR, PROFESOR, ALUMNO

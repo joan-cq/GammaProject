@@ -24,7 +24,6 @@ public class NotaServiceImpl implements NotaService {
 
     private final NotaRepository notaRepository;
     private final AlumnoRepository alumnoRepository;
-    private final CursoRepository cursoRepository;
     private final BimestreRepository bimestreRepository;
     private final AnioEscolarService anioEscolarService;
     private final ProfesorRepository profesorRepository;
@@ -36,7 +35,6 @@ public class NotaServiceImpl implements NotaService {
                            AnioEscolarService anioEscolarService, ProfesorRepository profesorRepository, GradoCursoRepository gradoCursoRepository) {
         this.notaRepository = notaRepository;
         this.alumnoRepository = alumnoRepository;
-        this.cursoRepository = cursoRepository;
         this.bimestreRepository = bimestreRepository;
         this.anioEscolarService = anioEscolarService;
         this.profesorRepository = profesorRepository;

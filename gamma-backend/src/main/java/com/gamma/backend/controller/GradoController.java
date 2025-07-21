@@ -20,13 +20,13 @@ public class GradoController {
         return gradoRepository.findAll();
     }
 
-    // POST /grado/add (opcional para agregar desde el frontend)
+    // POST /grado/add
     @PostMapping("/add")
     public Grado agregarGrado(@RequestBody Grado grado) {
         return gradoRepository.save(grado);
     }
 
-    // PUT /grado/update (opcional para editar grado)
+    // PUT /grado/update
     @PutMapping("/update")
     public Grado actualizarGrado(@RequestBody Grado grado) {
         return gradoRepository.save(grado);
