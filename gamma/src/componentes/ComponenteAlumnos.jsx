@@ -250,6 +250,8 @@ function ComponenteAlumnos() {
         alumno    ={selectedAlumno}
         fetchListarUsuarios={cargarAlumnos}
         dni       ={selectedAlumno.dni}
+        nombre    ={selectedAlumno.nombre}
+        apellido  ={selectedAlumno.apellido}
         tipoUsuario="alumno"
       />
     )}
