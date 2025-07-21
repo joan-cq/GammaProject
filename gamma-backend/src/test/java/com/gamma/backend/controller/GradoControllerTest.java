@@ -4,13 +4,11 @@ import com.gamma.backend.model.Grado;
 import com.gamma.backend.repository.GradoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class GradoControllerTest {
@@ -26,69 +24,68 @@ class GradoControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    // Test GET /grado/list
     @Test
-    void listarGrados_ReturnsListOfGrados() {
-        // Arrange
-        Grado grado1 = new Grado();
-        grado1.setCodigoGrado("G001");
-        grado1.setNombreGrado("Primer Grado");
+    void testListarGrados() {
+        Grado g1 = new Grado();
+        g1.setCodigoGrado("G1");
+        g1.setNombreGrado("Primero");
 
-        Grado grado2 = new Grado();
-        grado2.setCodigoGrado("G002");
-        grado2.setNombreGrado("Segundo Grado");
+        Grado g2 = new Grado();
+        g2.setCodigoGrado("G2");
+        g2.setNombreGrado("Segundo");
 
-        when(gradoRepository.findAll()).thenReturn(List.of(grado1, grado2));
+        List<Grado> lista = Arrays.asList(g1, g2);
 
-        // Act
-        List<Grado> response = gradoController.listarGrados();
+        when(gradoRepository.findAll()).thenReturn(lista);
 
-        // Assert
-        assertEquals(2, response.size());
+        List<Grado> resultado = gradoController.listarGrados();
+
+        assertEquals(2, resultado.size());
+        assertEquals("Primero", resultado.get(0).getNombreGrado());
+        verify(gradoRepository).findAll();
     }
 
+    // Test POST /grado/add
     @Test
-    void agregarGrado_ReturnsSavedGrado() {
-        // Arrange
+    void testAgregarGrado() {
         Grado grado = new Grado();
-        grado.setCodigoGrado("G001");
-        grado.setNombreGrado("Primer Grado");
+        grado.setCodigoGrado("G3");
+        grado.setNombreGrado("Tercero");
 
-        when(gradoRepository.save(any(Grado.class))).thenReturn(grado);
+        when(gradoRepository.save(grado)).thenReturn(grado);
 
-        // Act
-        Grado response = gradoController.agregarGrado(grado);
+        Grado resultado = gradoController.agregarGrado(grado);
 
-        // Assert
-        assertEquals("G001", response.getCodigoGrado());
-        verify(gradoRepository, times(1)).save(grado);
+        assertNotNull(resultado);
+        assertEquals("Tercero", resultado.getNombreGrado());
+        verify(gradoRepository).save(grado);
     }
 
+    // Test PUT /grado/update
     @Test
-    void actualizarGrado_ReturnsUpdatedGrado() {
-        // Arrange
+    void testActualizarGrado() {
         Grado grado = new Grado();
-        grado.setCodigoGrado("G001");
-        grado.setNombreGrado("Primer Grado");
+        grado.setCodigoGrado("G4");
+        grado.setNombreGrado("Cuarto");
 
-        when(gradoRepository.save(any(Grado.class))).thenReturn(grado);
+        when(gradoRepository.save(grado)).thenReturn(grado);
 
-        // Act
-        Grado response = gradoController.actualizarGrado(grado);
+        Grado resultado = gradoController.actualizarGrado(grado);
 
-        // Assert
-        assertEquals("G001", response.getCodigoGrado());
-        verify(gradoRepository, times(1)).save(grado);
+        assertEquals("Cuarto", resultado.getNombreGrado());
+        verify(gradoRepository).save(grado);
     }
 
+    // Test DELETE /grado/delete/{codigoGrado}
     @Test
-    void eliminarGrado_CallsDeleteById() {
-        // Arrange
-        String codigoGrado = "G001";
+    void testEliminarGrado() {
+        String codigo = "G5";
 
-        // Act
-        gradoController.eliminarGrado(codigoGrado);
+        doNothing().when(gradoRepository).deleteById(codigo);
 
-        // Assert
-        verify(gradoRepository, times(1)).deleteById(codigoGrado);
+        gradoController.eliminarGrado(codigo);
+
+        verify(gradoRepository).deleteById(codigo);
     }
 }

@@ -1,11 +1,13 @@
 package com.gamma.backend.controller;
 
 import com.gamma.backend.model.Administrador;
+import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AdministradorRepository;
-import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.LogService;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Map;
@@ -23,14 +26,11 @@ import static org.mockito.Mockito.*;
 
 class AdminControllerTest {
 
-    @Mock
-    private AdministradorRepository administradorRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private AnioEscolarService anioEscolarService;
+    @Mock private AdministradorRepository administradorRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private AnioEscolarService anioEscolarService;
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private LogService logService;
 
     @InjectMocks
     private AdminController adminController;
@@ -40,7 +40,6 @@ class AdminControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @SuppressWarnings("null")
     @Test
     void listarAdministradores_ReturnsOk() {
         // Arrange
@@ -49,18 +48,20 @@ class AdminControllerTest {
         anioActivo.setAnio(2024);
         anioActivo.setEstado("ACTIVO");
 
-        Administrador admin1 = new Administrador();
-        admin1.setDni("123");
-        admin1.setNombre("Admin");
-        admin1.setApellido("Uno");
-        User user1 = new User();
-        user1.setDni("123");
-        user1.setRol("ADMINISTRADOR");
-        admin1.setUser(user1);
-        admin1.setAnioEscolar(anioActivo);
+        User user = new User();
+        user.setDni("123");
+        user.setRol("ADMINISTRADOR");
+        user.setClave("claveCodificada");
+
+        Administrador admin = new Administrador();
+        admin.setDni("123");
+        admin.setNombre("Admin");
+        admin.setApellido("Uno");
+        admin.setUser(user);
+        admin.setAnioEscolar(anioActivo);
 
         when(anioEscolarService.obtenerAniosActivos()).thenReturn(List.of(anioActivo));
-        when(administradorRepository.findByAnioEscolarIn(List.of(anioActivo))).thenReturn(List.of(admin1));
+        when(administradorRepository.findByAnioEscolarIn(List.of(anioActivo))).thenReturn(List.of(admin));
 
         // Act
         ResponseEntity<List<Administrador>> response = adminController.listarAdministradores();
@@ -69,10 +70,8 @@ class AdminControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         assertEquals("ADMINISTRADOR", response.getBody().get(0).getRol());
-
     }
 
-    @SuppressWarnings("null")
     @Test
     void actualizarAdministrador_ReturnsOk() {
         // Arrange
@@ -80,6 +79,9 @@ class AdminControllerTest {
         admin.setDni("123");
         admin.setNombre("Admin");
         admin.setApellido("Uno");
+        admin.setCelular("987654321");
+        admin.setEstado("ACTIVO");
+
         User user = new User();
         user.setDni("123");
         user.setRol("ADMINISTRADOR");
@@ -94,6 +96,7 @@ class AdminControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Admin", response.getBody().getNombre());
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
@@ -104,9 +107,16 @@ class AdminControllerTest {
         anioActivo.setAnio(2024);
         anioActivo.setEstado("ACTIVO");
 
-        Map<String, String> payload = Map.of("dni", "123", "nombre", "Admin", "apellido", "Uno", "celular", "123456789", "clave", "secreto");
+        Map<String, String> payload = Map.of(
+            "dni", "123",
+            "nombre", "Admin",
+            "apellido", "Uno",
+            "celular", "123456789",
+            "clave", "secreto"
+        );
 
         when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
+        when(passwordEncoder.encode("secreto")).thenReturn("claveCodificada");
 
         // Act
         ResponseEntity<?> response = adminController.agregarAdministrador(payload);
@@ -114,6 +124,8 @@ class AdminControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(Map.of("mensaje", "Administrador agregado con éxito"), response.getBody());
+        verify(userRepository).save(any(User.class));
+        verify(administradorRepository).save(any(Administrador.class));
     }
 
     @Test
@@ -121,11 +133,9 @@ class AdminControllerTest {
         // Arrange
         Administrador admin = new Administrador();
         admin.setDni("123");
-        admin.setNombre("Admin");
-        admin.setApellido("Uno");
+
         User user = new User();
         user.setDni("123");
-        user.setRol("ADMINISTRADOR");
         admin.setUser(user);
 
         when(administradorRepository.findById("123")).thenReturn(Optional.of(admin));
@@ -136,23 +146,25 @@ class AdminControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(Map.of("mensaje", "Administrador eliminado con éxito"), response.getBody());
+        verify(administradorRepository).deleteById("123");
+        verify(userRepository).deleteById("123");
     }
 
     @Test
     void actualizarPassword_ReturnsOk() {
         // Arrange
-        Administrador admin = new Administrador();
-        admin.setDni("123");
-        admin.setNombre("Admin");
-        admin.setApellido("Uno");
         User user = new User();
         user.setDni("123");
-        user.setClave("secreto");
+        user.setClave("claveAntigua");
+
+        Administrador admin = new Administrador();
+        admin.setDni("123");
         admin.setUser(user);
 
-        Map<String, String> payload = Map.of("nuevaClave", "nuevaSecreto");
+        Map<String, String> payload = Map.of("nuevaClave", "nuevaClave123");
 
         when(administradorRepository.findById("123")).thenReturn(Optional.of(admin));
+        when(passwordEncoder.encode("nuevaClave123")).thenReturn("claveNuevaCodificada");
 
         // Act
         ResponseEntity<?> response = adminController.actualizarPassword("123", payload);
@@ -160,5 +172,6 @@ class AdminControllerTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(Map.of("mensaje", "Contraseña actualizada con éxito"), response.getBody());
+        verify(userRepository).save(user);
     }
 }

@@ -2,28 +2,27 @@ package com.gamma.backend.controller;
 
 import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.repository.AnioEscolarRepository;
+import com.gamma.backend.service.LogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
+import org.mockito.*;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class AnioEscolarControllerTest {
 
+    @InjectMocks
+    private AnioEscolarController controller;
+
     @Mock
     private AnioEscolarRepository anioEscolarRepository;
 
-    @InjectMocks
-    private AnioEscolarController anioEscolarController;
+    @Mock
+    private LogService logService;
 
     @BeforeEach
     void setUp() {
@@ -31,48 +30,53 @@ class AnioEscolarControllerTest {
     }
 
     @Test
-    void listarAniosEscolares_ReturnsOk() {
-        // Arrange
-        AnioEscolar anio1 = new AnioEscolar();
-        anio1.setId(1);
-        anio1.setAnio(2023);
-        anio1.setEstado("CERRADO");
+    void testListarAniosEscolares() {
+        List<AnioEscolar> mockLista = List.of(
+                new AnioEscolar(1, 2024, "activo"),
+                new AnioEscolar(2, 2023, "inactivo")
+        );
 
-        AnioEscolar anio2 = new AnioEscolar();
-        anio2.setId(2);
-        anio2.setAnio(2024);
-        anio2.setEstado("ACTIVO");
+        when(anioEscolarRepository.findAll()).thenReturn(mockLista);
 
-        when(anioEscolarRepository.findAll()).thenReturn(List.of(anio1, anio2));
+        ResponseEntity<List<AnioEscolar>> response = controller.listarAniosEscolares();
 
-        // Act
-        ResponseEntity<List<AnioEscolar>> response = anioEscolarController.listarAniosEscolares();
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals(2, response.getBody().size());
+        verify(logService, times(1)).addLog(eq("INFO"), contains("listado los años escolares"));
     }
 
     @Test
-    void actualizarEstado_ReturnsOk() {
-        // Arrange
-        AnioEscolar anio = new AnioEscolar();
-        anio.setId(1);
-        anio.setAnio(2023);
-        anio.setEstado("CERRADO");
+    void testActualizarEstado() {
+        Long id = 1L;
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", id);
+        payload.put("estado", "activo");
 
-        Map<String, Object> payload = Map.of("id", 1, "estado", "ACTIVO");
+        AnioEscolar mockAnio = new AnioEscolar(3, 2025, "inactivo");
+        when(anioEscolarRepository.findById(id)).thenReturn(Optional.of(mockAnio));
+        when(anioEscolarRepository.save(any(AnioEscolar.class))).thenReturn(mockAnio);
 
-        when(anioEscolarRepository.findById(1L)).thenReturn(Optional.of(anio));
-        when(anioEscolarRepository.save(any(AnioEscolar.class))).thenReturn(anio);
+        ResponseEntity<?> response = controller.actualizarEstado(payload);
 
-        // Act
-        ResponseEntity<?> response = anioEscolarController.actualizarEstado(payload);
+        assertEquals(200, response.getStatusCodeValue());
+        assertTrue(((Map<?, ?>) response.getBody()).get("mensaje").toString().contains("actualizado"));
+        assertEquals("activo", mockAnio.getEstado());
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(Map.of("mensaje", "Año escolar actualizado con éxito"), response.getBody());
-        verify(anioEscolarRepository, times(1)).save(anio);
-        assertEquals("ACTIVO", anio.getEstado());
+        verify(anioEscolarRepository).save(mockAnio);
+        verify(logService).addLog(eq("INFO"), contains("actualizado el estado"));
+    }
+
+    @Test
+    void testActualizarEstado_NotFound() {
+        Long id = 99L;
+        Map<String, Object> payload = Map.of("id", id, "estado", "activo");
+
+        when(anioEscolarRepository.findById(id)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            controller.actualizarEstado(payload);
+        });
+
+        assertEquals("Año escolar no encontrado con ID: " + id, exception.getMessage());
     }
 }

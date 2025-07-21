@@ -4,17 +4,17 @@ import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.Bimestre;
 import com.gamma.backend.repository.BimestreRepository;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BimestreControllerTest {
 
@@ -33,30 +33,46 @@ class BimestreControllerTest {
     }
 
     @Test
-    void listarBimestresActivos_ReturnsListOfBimestres() {
+    void testListarBimestresActivos() {
         // Arrange
         AnioEscolar anioActivo = new AnioEscolar();
         anioActivo.setId(1);
-        anioActivo.setAnio(2024);
-        anioActivo.setEstado("ACTIVO");
 
-        Bimestre bimestre1 = new Bimestre();
-        bimestre1.setId(1);
-        bimestre1.setNombre("Bimestre 1");
-        bimestre1.setAnioEscolar(anioActivo);
+        Bimestre b1 = new Bimestre();
+        b1.setId(1);
+        b1.setNombre("Primer Bimestre");
+        b1.setAnioEscolar(anioActivo);
 
-        Bimestre bimestre2 = new Bimestre();
-        bimestre2.setId(2);
-        bimestre2.setNombre("Bimestre 2");
-        bimestre2.setAnioEscolar(anioActivo);
+        Bimestre b2 = new Bimestre();
+        b2.setId(2);
+        b2.setNombre("Segundo Bimestre");
+        b2.setAnioEscolar(anioActivo);
+
+        List<Bimestre> bimestres = Arrays.asList(b1, b2);
 
         when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
-        when(bimestreRepository.findByAnioEscolar(anioActivo)).thenReturn(List.of(bimestre1, bimestre2));
+        when(bimestreRepository.findByAnioEscolar(anioActivo)).thenReturn(bimestres);
 
         // Act
-        List<Bimestre> response = bimestreController.listarBimestresActivos();
+        List<Bimestre> resultado = bimestreController.listarBimestresActivos();
 
         // Assert
-        assertEquals(2, response.size());
+        assertNotNull(resultado);
+        assertEquals(2, resultado.size());
+        assertEquals("Primer Bimestre", resultado.get(0).getNombre());
+        assertEquals("Segundo Bimestre", resultado.get(1).getNombre());
+    }
+
+    @Test
+    void testListarBimestresActivos_SinAnioActivo() {
+        // Arrange
+        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.empty());
+
+        // Act
+        List<Bimestre> resultado = bimestreController.listarBimestresActivos();
+
+        // Assert
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty()); // si retorna null puede fallar, depende de tu lógica real
     }
 }

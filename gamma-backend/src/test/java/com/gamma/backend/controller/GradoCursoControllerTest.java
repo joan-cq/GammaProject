@@ -1,22 +1,16 @@
 package com.gamma.backend.controller;
 
-import com.gamma.backend.model.AnioEscolar;
-import com.gamma.backend.model.Curso;
-import com.gamma.backend.model.Grado;
-import com.gamma.backend.model.GradoCurso;
+import com.gamma.backend.model.*;
 import com.gamma.backend.repository.GradoCursoRepository;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class GradoCursoControllerTest {
 
@@ -29,63 +23,87 @@ class GradoCursoControllerTest {
     @InjectMocks
     private GradoCursoController gradoCursoController;
 
-    private AnioEscolar anioActivo;
-    private Grado grado;
-    private Curso curso;
-    private GradoCurso gradoCurso;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+    }
 
-        anioActivo = new AnioEscolar();
-        anioActivo.setId(1);
-        anioActivo.setAnio(2024);
-        anioActivo.setEstado("ACTIVO");
+    // Test para GET /grado_curso/filtrar/{codigoCurso}
+    @Test
+    void testListarGradosPorCurso() {
+        // Arrange
+        String codigoCurso = "MAT";
+        AnioEscolar anioActivo = new AnioEscolar();
+        anioActivo.setId(2025);
 
-        grado = new Grado();
-        grado.setCodigoGrado("G001");
-        grado.setNombreGrado("Primer Grado");
-        grado.setNivel("Primaria");
+        Grado grado1 = new Grado();
+        grado1.setCodigoGrado("G1");
+        grado1.setNombreGrado("Primero");
 
-        curso = new Curso();
-        curso.setCodigoCurso("C001");
-        curso.setNombre("Matemáticas");
+        GradoCurso relacion = new GradoCurso();
+        relacion.setCurso(new Curso());
+        relacion.setGrado(grado1);
+        relacion.setAnioEscolar(anioActivo);
+        relacion.setEstado("ACTIVO");
 
-        gradoCurso = new GradoCurso();
-        gradoCurso.setGrado(grado);
-        gradoCurso.setCurso(curso);
-        gradoCurso.setAnioEscolar(anioActivo);
-        gradoCurso.setEstado("ACTIVO");
+        List<GradoCurso> relaciones = List.of(relacion);
+
+        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
+        when(gradoCursoRepository.findByCurso_CodigoCursoAndAnioEscolar_IdAndEstado(codigoCurso, 2025, "ACTIVO"))
+                .thenReturn(relaciones);
+
+        // Act
+        List<Grado> resultado = gradoCursoController.listarGradosPorCurso(codigoCurso);
+
+        // Assert
+        assertEquals(1, resultado.size());
+        assertEquals("G1", resultado.get(0).getCodigoGrado());
+        verify(gradoCursoRepository).findByCurso_CodigoCursoAndAnioEscolar_IdAndEstado(codigoCurso, 2025, "ACTIVO");
+    }
+
+    // Test para GET /grado_curso/cursos/{codigoGrado}
+    @Test
+    void testListarCursosPorGrado() {
+        // Arrange
+        String codigoGrado = "G2";
+        AnioEscolar anioActivo = new AnioEscolar();
+        anioActivo.setId(2025);
+
+        Curso curso = new Curso();
+        curso.setCodigoCurso("LEN");
+        curso.setNombre("Lenguaje");
+
+        GradoCurso relacion = new GradoCurso();
+        relacion.setCurso(curso);
+        relacion.setGrado(new Grado());
+        relacion.setAnioEscolar(anioActivo);
+        relacion.setEstado("ACTIVO");
+
+        List<GradoCurso> relaciones = List.of(relacion);
+
+        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
+        when(gradoCursoRepository.findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(codigoGrado, 2025, "ACTIVO"))
+                .thenReturn(relaciones);
+
+        // Act
+        List<Curso> resultado = gradoCursoController.listarCursosPorGrado(codigoGrado);
+
+        // Assert
+        assertEquals(1, resultado.size());
+        assertEquals("LEN", resultado.get(0).getCodigoCurso());
+        verify(gradoCursoRepository).findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(codigoGrado, 2025, "ACTIVO");
     }
 
     @Test
-    void listarGradosPorCurso_ReturnsListOfGrados() {
+    void testListarCursosPorGrado_SinAnioActivo() {
         // Arrange
-        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
-        when(gradoCursoRepository.findByCurso_CodigoCursoAndAnioEscolar_IdAndEstado("C001", 1, "ACTIVO"))
-                .thenReturn(List.of(gradoCurso));
+        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.empty());
 
         // Act
-        List<Grado> response = gradoCursoController.listarGradosPorCurso("C001");
+        List<Curso> resultado = gradoCursoController.listarCursosPorGrado("G3");
 
         // Assert
-        assertEquals(1, response.size());
-        assertEquals("G001", response.get(0).getCodigoGrado());
-    }
-
-    @Test
-    void listarCursosPorGrado_ReturnsListOfCursos() {
-        // Arrange
-        when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
-        when(gradoCursoRepository.findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado("G001", 1, "ACTIVO"))
-                .thenReturn(List.of(gradoCurso));
-
-        // Act
-        List<Curso> response = gradoCursoController.listarCursosPorGrado("G001");
-
-        // Assert
-        assertEquals(1, response.size());
-        assertEquals("C001", response.get(0).getCodigoCurso());
+        assertTrue(resultado.isEmpty());
+        verify(gradoCursoRepository, never()).findByGrado_CodigoGradoAndAnioEscolar_IdAndEstado(any(), anyInt(), any());
     }
 }

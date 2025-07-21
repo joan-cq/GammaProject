@@ -7,6 +7,7 @@ import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AlumnoRepository;
 import com.gamma.backend.repository.GradoRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.LogService;
 import com.gamma.backend.service.modelservice.AlumnoService;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +17,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class AlumnoControllerTest {
@@ -40,6 +43,12 @@ class AlumnoControllerTest {
 
     @Mock
     private AlumnoService alumnoService;
+
+    @Mock
+    private LogService logService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private AlumnoController alumnoController;
@@ -127,11 +136,20 @@ class AlumnoControllerTest {
         grado.setCodigoGrado("G001");
         grado.setNombreGrado("Primer Grado");
 
-        Map<String, String> payload = Map.of("dni", "123", "nombre", "Alumno", "apellido", "Uno", "celularApoderado", "123456789", "genero", "M", "codigoGrado", "G001", "clave", "secreto");
+        Map<String, String> payload = Map.of(
+                "dni", "123",
+                "nombre", "Alumno",
+                "apellido", "Uno",
+                "celularApoderado", "123456789",
+                "genero", "M",
+                "codigoGrado", "G001",
+                "clave", "secreto"
+        );
 
         when(userRepository.existsById("123")).thenReturn(false);
         when(gradoRepository.findById("G001")).thenReturn(Optional.of(grado));
         when(anioEscolarService.obtenerAnioActivo()).thenReturn(Optional.of(anioActivo));
+        when(passwordEncoder.encode("secreto")).thenReturn("encodedSecreto");
 
         // Act
         ResponseEntity<?> response = alumnoController.agregarAlumno(payload);
@@ -178,6 +196,7 @@ class AlumnoControllerTest {
         Map<String, String> payload = Map.of("nuevaClave", "nuevaSecreto");
 
         when(alumnoRepository.findById("123")).thenReturn(Optional.of(alumno));
+        when(passwordEncoder.encode("nuevaSecreto")).thenReturn("encodedNuevaSecreto");
 
         // Act
         ResponseEntity<?> response = alumnoController.actualizarPassword("123", payload);
