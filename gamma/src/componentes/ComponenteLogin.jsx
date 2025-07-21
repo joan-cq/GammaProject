@@ -12,61 +12,49 @@ function ComponenteLogin() {
 
     const fetchCredenciales = async () => {
         try {
-            const requestBody = JSON.stringify({
-                dni: idUsuario,
-                clave: clave
-            });
-
-            console.log("Enviando solicitud a /auth/login con:", requestBody);
-
-            const response = await fetch('http://localhost:8080/login', {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: requestBody
+                body: JSON.stringify({ dni: idUsuario, clave: clave })
             });
 
             const data = await response.json();
 
-            console.log("Respuesta del backend:", data);
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
 
-            if (response.ok && (data.rol === "ADMINISTRADOR" || data.rol === "PROFESOR")) {
-               
-                Swal.fire({
-                    title: '¡Bienvenido!',
-                    text: '¡Credenciales Correctas!',
-                    icon: 'success',
-                });
-                
-                if (data.rol === "PROFESOR") {
-                    const codigoCursoResponse = await fetch(`http://localhost:8080/profesor/codigo_curso?dni=${idUsuario}`);
-                    const codigoCursoData = await codigoCursoResponse.json();
-                    auth.iniciarSesion({ Rol: data.rol, Clave: data.clave, CodigoCurso: codigoCursoData.codigo_curso });
+                if (data.rol === "ADMINISTRADOR" || data.rol === "PROFESOR") {
+                    Swal.fire({
+                        title: '¡Bienvenido!',
+                        text: '¡Credenciales Correctas!',
+                        icon: 'success',
+                    });
+
+                    auth.iniciarSesion(data);
+
+                    if (data.rol === "ADMINISTRADOR") {
+                        navigate('/panel/listaalumnos');
+                    } else if (data.rol === "PROFESOR") {
+                        navigate('/panel/listanotas');
+                    }
                 } else {
-                    auth.iniciarSesion({ Rol: data.rol, Clave: data.clave });
+                    Swal.fire({
+                        title: '¡Acceso Denegado!',
+                        text: 'Los alumnos no tienen permitido el acceso aquí.',
+                        icon: 'error',
+                    });
                 }
-
-                if (data.rol === "ADMINISTRADOR") {
-                    navigate('/panel/listaalumnos');
-                } else if (data.rol === "PROFESOR") {
-                    navigate('/panel/listanotas');
-                }
-             } else {
-                let title = '¡Error!';
-                let text = '¡Credenciales Incorrectas!';
-                if (response.ok && data.rol === "ALUMNO") {
-                    title = '¡Acceso Denegado!';
-                    text = 'Los alumnos no tienen permitido el acceso aquí.';
-                }
+            } else {
                 Swal.fire({
-                    title: title,
-                    text: text,
+                    title: '¡Error!',
+                    text: data.error || '¡Credenciales Incorrectas!',
                     icon: 'error',
                 });
                 setClave("");
                 setIdUsuario("");
-             }
+            }
         } catch (error) {
             console.error('Error al conectar con el backend:', error);
             Swal.fire({

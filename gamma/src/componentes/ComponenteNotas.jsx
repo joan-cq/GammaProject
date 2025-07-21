@@ -20,7 +20,7 @@ function ComponenteNotas() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8080/login', {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dni, clave: password }),
@@ -29,6 +29,7 @@ function ComponenteNotas() {
             const data = await response.json();
 
             if (response.ok && data.rol === 'ALUMNO') {
+                localStorage.setItem('token', data.token);
                 await fetchInitialData(dni);
                 Swal.fire({
                     title: '¡Bienvenido!',
@@ -62,24 +63,27 @@ function ComponenteNotas() {
 
     const fetchInitialData = async (alumnoDni) => {
         try {
-            const alumnosResponse = await fetch('http://localhost:8080/alumno/list');
+            const token = localStorage.getItem('token');
+            const authHeader = { 'Authorization': `Bearer ${token}` };
+
+            const alumnosResponse = await fetch('http://localhost:8080/alumno/list', { headers: authHeader });
             const alumnosData = await alumnosResponse.json();
             const currentAlumno = alumnosData.find(a => a.dni === alumnoDni);
             if (!currentAlumno) throw new Error("No se encontraron los datos del alumno.");
             setAlumno(currentAlumno);
 
-            const aniosResponse = await fetch('http://localhost:8080/anioescolar/list');
+            const aniosResponse = await fetch('http://localhost:8080/anioescolar/list', { headers: authHeader });
             const aniosData = await aniosResponse.json();
             const activeYear = aniosData.find(a => a.estado === 'ACTIVO');
             setAnioActivo(activeYear ? activeYear.anio : 'No definido');
 
-            const gradosResponse = await fetch('http://localhost:8080/grado/list');
+            const gradosResponse = await fetch('http://localhost:8080/grado/list', { headers: authHeader });
             const gradosData = await gradosResponse.json();
             const currentGrado = gradosData.find(g => g.codigoGrado === currentAlumno.codigoGrado);
             setGrado(currentGrado);
 
             if (currentAlumno.codigoGrado) {
-                const cursosResponse = await fetch(`http://localhost:8080/grado_curso/cursos/${currentAlumno.codigoGrado}`);
+                const cursosResponse = await fetch(`http://localhost:8080/grado_curso/cursos/${currentAlumno.codigoGrado}`, { headers: authHeader });
                 const cursosData = await cursosResponse.json();
                 setCursos(cursosData);
             }
@@ -101,7 +105,10 @@ function ComponenteNotas() {
         setBimestreSeleccionado(bimestre);
         if (cursoSeleccionado && alumno && grado) {
             try {
-                const response = await fetch(`http://localhost:8080/notas/alumnos?codigoGrado=${grado.codigoGrado}&idBimestre=${bimestre}&codigoCurso=${cursoSeleccionado.codigoCurso}`);
+                const token = localStorage.getItem('token');
+                const response = await fetch(`http://localhost:8080/notas/alumnos?codigoGrado=${grado.codigoGrado}&idBimestre=${bimestre}&codigoCurso=${cursoSeleccionado.codigoCurso}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 const data = await response.json();
                 const notasAlumno = data.filter(n => n.dni === alumno.dni);
                 setNotas(notasAlumno);
@@ -117,7 +124,10 @@ function ComponenteNotas() {
         setCursoSeleccionado(null);
         setBimestreSeleccionado(null);
         try {
-            const response = await fetch(`http://localhost:8080/notas/alumno/${alumno.dni}`);
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:8080/notas/alumno/${alumno.dni}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
             const data = await response.json();
             const notasAgrupadas = data.reduce((acc, nota) => {
                 const curso = nota.curso;

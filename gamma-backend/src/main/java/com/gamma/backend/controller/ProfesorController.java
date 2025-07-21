@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.gamma.backend.model.Curso;
 import com.gamma.backend.repository.CursoRepository;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,9 @@ public class ProfesorController {
 
     @Autowired
     private AnioEscolarService anioEscolarService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/profesor/list")
     public ResponseEntity<List<Profesor>> listarProfesores() {
@@ -100,7 +104,7 @@ public class ProfesorController {
 
         User user = new User();
         user.setDni(dni);
-        user.setClave(clave);
+        user.setClave(passwordEncoder.encode(clave));
         user.setRol("PROFESOR");
         userRepository.save(user);
 
@@ -164,7 +168,7 @@ public class ProfesorController {
 
             if (user != null) {
                 // Actualizar la contraseña del usuario
-                user.setClave(nuevaClave);
+                user.setClave(passwordEncoder.encode(nuevaClave));
                 userRepository.save(user);
 
                 return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada con éxito"));

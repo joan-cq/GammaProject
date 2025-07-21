@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from './api.js';
 import Swal from 'sweetalert2';
 import { ComponentePanelAdmin } from "./index.js";
 
@@ -9,7 +9,7 @@ function ComponenteAnioEscolar() {
 
     const obtenerAnios = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/anioescolar/list");
+            const res = await apiClient.get("/anioescolar/list");
             setListaAniosEscolares(res.data);
         } catch (err) {
             console.error("Error al obtener años escolares:", err);
@@ -28,7 +28,7 @@ function ComponenteAnioEscolar() {
             confirmButtonText: `Sí, ${nuevoEstado === "ACTIVO" ? "activar" : "desactivar"}`
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.put("http://localhost:8080/anioescolar/update", {
+                apiClient.put("/anioescolar/update", {
                     id: id,
                     estado: nuevoEstado,
                 })

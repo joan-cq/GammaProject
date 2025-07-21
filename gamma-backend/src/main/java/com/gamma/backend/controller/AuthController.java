@@ -1,63 +1,71 @@
 package com.gamma.backend.controller;
 
-import com.gamma.backend.service.auth.LoginService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.gamma.backend.model.Profesor;
+import com.gamma.backend.model.User;
+import com.gamma.backend.repository.ProfesorRepository;
+import com.gamma.backend.repository.UserRepository;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/auth")
 public class AuthController {
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
-    private LoginService loginService;
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProfesorRepository profesorRepository;
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String dni = credentials.get("dni");
         String clave = credentials.get("clave");
 
-        String resultado = loginService.autenticar(dni, clave);
-        logger.info("Intento de inicio de sesión para el usuario con DNI: {}", dni);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dni, clave));
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        User user = userRepository.findByDni(userDetails.getUsername());
 
-        ResponseEntity<?> response;
-        switch (resultado) {
-            case "ADMINISTRADOR", "PROFESOR", "ALUMNO":
-                logger.info("Inicio de sesión exitoso para el usuario con DNI: {} y rol: {}", dni, resultado);
-                response = ResponseEntity.ok(Map.of("rol", resultado, "mensaje", "Login exitoso"));
-                break;
-            case "CLAVE_INCORRECTA":
-                logger.warn("Contraseña incorrecta para el usuario con DNI: {}", dni);
-                response = ResponseEntity.status(401).body(Map.of("error", "Contraseña incorrecta"));
-                break;
-            case "INACTIVO":
-                logger.warn("Usuario inactivo con DNI: {}", dni);
-                response = ResponseEntity.status(403).body(Map.of("error", "Usuario inactivo"));
-                break;
-            case "ANIO_INACTIVO":
-                logger.warn("Usuario con DNI: {} no pertenece al año escolar activo", dni);
-                response = ResponseEntity.status(403).body(Map.of("error", "Usuario no pertenece al año activo"));
-                break;
-            case "NO_ANIOS_ACTIVOS":
-                logger.error("No hay año escolar activo en el sistema al intentar login de DNI: {}", dni);
-                response = ResponseEntity.status(503).body(Map.of("error", "No hay año escolar activo"));
-                break;
-            case "ROL_DESCONOCIDO":
-                logger.error("Rol desconocido para el usuario con DNI: {}", dni);
-                response = ResponseEntity.status(403).body(Map.of("error", "Rol no reconocido"));
-                break;
-            case "NO_EXISTE":
-                logger.warn("Usuario no encontrado con DNI: {}", dni);
-                response = ResponseEntity.status(404).body(Map.of("error", "Usuario no encontrado"));
-                break;
-            default:
-                logger.error("Error inesperado durante el inicio de sesión para el usuario con DNI: {}", dni);
-                response = ResponseEntity.status(500).body(Map.of("error", "Error inesperado"));
+        String token = Jwts.builder()
+                .setSubject(user.getDni())
+                .claim("rol", user.getRol())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("rol", user.getRol());
+
+        if ("PROFESOR".equals(user.getRol())) {
+            Profesor profesor = profesorRepository.findByDni(user.getDni());
+            if (profesor != null && profesor.getCurso() != null) {
+                response.put("codigoCurso", profesor.getCurso().getCodigoCurso());
+            }
         }
-        return response;
+
+        return ResponseEntity.ok(response);
     }
 }

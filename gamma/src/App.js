@@ -9,7 +9,7 @@ import './App.css';
 // Importaciones de imágenes
 import LogoGamma from './recursos/insignia.jpg';
 // Importaciones Componentes
-import { ComponenteAnioEscolar, ComponenteProfesores, ComponenteAsistencia, ComponenteProNotas, ComponenteAlumnos, ComponenteCursos, ComponenteAdmin, ComponenteNotas, ComponenteContacto, ComponenteInicio, ComponenteLogin, ComponenteLogros, ComponenteNosotros, ComponenteUpdatePassword} from "./componentes"
+import { ComponenteAnioEscolar, ComponenteProfesores, ComponenteProNotas, ComponenteAlumnos, ComponenteCursos, ComponenteAdmin, ComponenteNotas, ComponenteContacto, ComponenteInicio, ComponenteLogin, ComponenteLogros, ComponenteNosotros, ComponenteUpdatePassword} from "./componentes"
 
 // Contexto de autenticación
 export const AuthContext = createContext(null);
@@ -29,15 +29,26 @@ function RutaProtegida({ children }) {
 }
 
 function App() {
-    const [usuario, setUsuario] = useState(null);
+    const [usuario, setUsuario] = useState(() => {
+        const storedUser = localStorage.getItem('usuario');
+        try {
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch (error) {
+            console.error("Error al parsear el usuario desde localStorage", error);
+            return null;
+        }
+    });
 
     // Función para iniciar sesión
     const iniciarSesion = (userData) => {
+        localStorage.setItem('usuario', JSON.stringify(userData));
         setUsuario(userData);
     };
 
     // Función para cerrar sesión
     const cerrarSesion = () => {
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('token'); // Asegurarse de limpiar también el token
         setUsuario(null);
     };
 
@@ -77,7 +88,6 @@ function App() {
                         <Route path="/panel/listaadmin" element={<RutaProtegida><ComponenteAdmin /></RutaProtegida>} />
                         <Route path="/panel/listacursos" element={<RutaProtegida><ComponenteCursos /></RutaProtegida>} />
                         <Route path="/panel/listanotas" element={<RutaProtegida><ComponenteProNotas /></RutaProtegida>} />
-                        <Route path="/panel/listaasistencia" element={<RutaProtegida><ComponenteAsistencia /></RutaProtegida>} />
                         <Route path="/panel/listamaestros" element={<RutaProtegida><ComponenteProfesores /></RutaProtegida>} />
                         <Route path="/panel/updatepassword" element={<RutaProtegida><ComponenteUpdatePassword /></RutaProtegida>} />
                         <Route path="/panel/anioescolar" element={<RutaProtegida><ComponenteAnioEscolar /></RutaProtegida>} />

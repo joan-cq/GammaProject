@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "./api.js";
 import Swal from 'sweetalert2';
 import { ComponentePanelAdmin, ComponenteUpdatePassword } from "./index.js"
 
@@ -21,12 +21,8 @@ function ComponenteProfesores() {
 
     const fetchListarProfesor = async () => {
         try {
-            const apiURL = await fetch("http://localhost:8080/profesor/list");
-            if (!apiURL.ok) {
-                console.log("LA API PROFESOR NO EXISTE");
-            }
-            const data = await apiURL.json();
-            setProfesorUsuario(data);
+            const response = await apiClient.get("/profesor/list");
+            setProfesorUsuario(response.data);
         } catch (error) {
             console.log(error);
         }
@@ -34,7 +30,7 @@ function ComponenteProfesores() {
 
     const fetchCursos = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/curso/list");
+            const res = await apiClient.get("/curso/list");
             setCursos(res.data.filter(c => c.estado === 'ACTIVO'));
         } catch (error) {
             console.error("Error cargando cursos:", error);
@@ -47,7 +43,7 @@ function ComponenteProfesores() {
       return;
     }
 
-    axios.post("http://localhost:8080/profesor/add", {
+    apiClient.post("/profesor/add", {
       dni: dniUsuario,
       nombre: nombre,
       apellido: apellido,
@@ -93,7 +89,7 @@ function ComponenteProfesores() {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:8080/profesor/delete/${dni}`)
+                apiClient.delete(`/profesor/delete/${dni}`)
                 .then(() => {
                     fetchListarProfesor();
                 });
@@ -129,7 +125,7 @@ function ComponenteProfesores() {
             return;
         }
 
-        axios.put("http://localhost:8080/profesor/update", {
+        apiClient.put("/profesor/update", {
             dni: dniUsuario,
             nombre: nombre,
             apellido: apellido,

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,9 @@ public class AdminController {
 
     @Autowired
     private AnioEscolarService anioEscolarService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/admin/list")
     public ResponseEntity<List<Administrador>> listarAdministradores() {
@@ -97,7 +101,7 @@ public class AdminController {
         // Crear el usuario
         User user = new User();
         user.setDni(dni);
-        user.setClave(clave);
+        user.setClave(passwordEncoder.encode(clave));
         user.setRol("ADMINISTRADOR");
         userRepository.save(user);
 
@@ -158,7 +162,7 @@ public class AdminController {
 
             if (user != null) {
                 // Actualizar la contraseña del usuario
-                user.setClave(nuevaClave);
+                user.setClave(passwordEncoder.encode(nuevaClave));
                 userRepository.save(user);
                 logger.info("Contraseña del administrador con DNI {} actualizada.", dni);
 

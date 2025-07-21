@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import apiClient from "./api.js";
 import Swal from 'sweetalert2';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { ComponentePanelAdmin } from './index';
@@ -16,7 +17,7 @@ function ComponenteCursos() {
 
     const cargarCursos = async () => {
         try {
-            const res = await axios.get('http://localhost:8080/curso/list');
+            const res = await apiClient.get("curso/list");
             setCursos(res.data);
         } catch (error) {
             console.error("Error cargando cursos:", error);
@@ -46,10 +47,10 @@ function ComponenteCursos() {
     const guardarCurso = async () => {
         try {
             if (esNuevo) {
-                await axios.post('http://localhost:8080/curso/add', cursoActual);
+                await apiClient.post("/curso/add", cursoActual);
                 Swal.fire('¡Curso agregado!', '', 'success');
             } else {
-                await axios.put(`http://localhost:8080/curso/update/${cursoActual.codigoCurso}`, cursoActual);
+                await apiClient.post("/curso/update/${cursoActual.codigoCurso}", cursoActual);
                 Swal.fire('¡Curso actualizado!', '', 'success');
             }
             cerrarModal();
@@ -62,7 +63,7 @@ function ComponenteCursos() {
 
     const toggleEstado = async (codigoCurso) => {
         try {
-            await axios.put(`http://localhost:8080/curso/toggle/${codigoCurso}`);
+            await apiClient.post("curso/toggle/${codigoCurso}");
             Swal.fire('¡Estado actualizado!', '', 'success');
             cargarCursos();
         } catch (error) {

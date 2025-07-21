@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "./api.js";
 import Swal from 'sweetalert2';
 import { ComponentePanelAdmin, ComponenteUpdatePassword } from "./index.js"
 
@@ -19,7 +19,7 @@ function ComponenteAdministradores() {
 
     const fetchListarAdministrador = async () => {
     try {
-        const res = await axios.get("http://localhost:8080/admin/list");
+        const res = await apiClient.get("/admin/list");
         if (Array.isArray(res.data)) {
             setAdministradorUsuario(res.data);
         } else {
@@ -38,7 +38,7 @@ function ComponenteAdministradores() {
       return;
     }
 
-    axios.post("http://localhost:8080/admin/add", {
+    apiClient.post("/admin/add", {
       dni: dniUsuario,
       nombre: nombre,
       apellido: apellido,
@@ -82,7 +82,7 @@ function ComponenteAdministradores() {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:8080/admin/delete/${dni}`)
+                apiClient.delete(`/admin/delete/${dni}`)
                 .then(() => {
                     fetchListarAdministrador();
                 });
@@ -117,7 +117,7 @@ function ComponenteAdministradores() {
             return;
         }
 
-        axios.put("http://localhost:8080/admin/update", {
+        apiClient.put("/admin/update", {
             dni: dniUsuario,
             nombre: nombre,
             apellido: apellido,

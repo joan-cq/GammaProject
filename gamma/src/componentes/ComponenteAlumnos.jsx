@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios  from "axios";
+import apiClient from "./api.js";
 import Swal   from "sweetalert2";
 import { ComponentePanelAdmin, ComponenteUpdatePassword } from "./index.js";
 
@@ -35,21 +35,21 @@ function ComponenteAlumnos() {
 
   /* ───────────────────────── peticiones ───────────────────────── */
   const cargarAlumnos = async ()=>{
-      try{ const r=await axios.get("http://localhost:8080/alumno/list");
+      try{ const r = await apiClient.get("/alumno/list");
            setAlumnos(r.data); }
       catch(e){ console.error(e); }
-  };
-  const cargarGrados = async ()=>{
-      try{ const r=await axios.get("http://localhost:8080/grado/list");
+    };
+    const cargarGrados = async ()=>{
+      try{ const r=await apiClient.get("/grado/list");
            setGrados(r.data); }
       catch(e){ console.error(e); }
-  };
+    };
 
   /* ───────────── agregar ───────────── */
   const agregar = ()=>{
       if(!dni||!nombre||!apellido||!celularApoderado||!genero||!codigoGrado||!clave){
          setError("Por favor complete todos los campos"); return; }
-      axios.post("http://localhost:8080/alumno/add",{
+      apiClient.post("/alumno/add",{
            dni,nombre,apellido,
            celularApoderado,
            genero,
@@ -67,7 +67,7 @@ function ComponenteAlumnos() {
   const actualizar = ()=>{
       if(!dni||!nombre||!apellido||!celularApoderado||!genero||!codigoGrado||!estado){
          setError("Por favor complete todos los campos"); return; }
-      axios.put("http://localhost:8080/alumno/update",{
+      apiClient.put("/alumno/update",{
           dni,nombre,apellido,celularApoderado,genero,codigoGrado,estado
       }).then(()=>{
           Swal.fire("Actualizado","Alumno actualizado","success");
@@ -82,8 +82,8 @@ function ComponenteAlumnos() {
       Swal.fire({title:"¿Eliminar?",icon:"warning",showCancelButton:true})
       .then(res=>{
          if(res.isConfirmed){
-           axios.delete(`http://localhost:8080/alumno/delete/${dni}`)
-                .then(()=>{ Swal.fire("Eliminado","","success"); cargarAlumnos(); });
+           apiClient.delete(`/alumno/delete/${dni}`)
+                 .then(()=>{ Swal.fire("Eliminado","","success"); cargarAlumnos(); });
          }
       });
   };

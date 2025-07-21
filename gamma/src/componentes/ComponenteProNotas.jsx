@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from '../App';
-import axios from "axios";
+import apiClient from "./api.js";
 import Swal from 'sweetalert2';
 import { Modal, Button, Form } from "react-bootstrap";
 import { ComponentePanelProfesores } from "./index";
@@ -15,28 +15,20 @@ function ComponenteProNotas() {
     const [modalShow, setModalShow] = useState(false);
     const [notaModal, setNotaModal] = useState({ dni: "", nombre: "", apellido: "", nota: "", accion: "", idNota: null });
 
-    const [codigoCurso, setCodigoCurso] = useState(auth.usuario?.CodigoCurso || "");
-
-    const cargarFiltrosIniciales = async () => {
-        try {
-            const bimestreRes = await axios.get("http://localhost:8080/bimestre/activos");
-            setBimestres(bimestreRes.data);
-
-            const gradosRes = await axios.get(`http://localhost:8080/grado_curso/filtrar/${codigoCurso}`);
-            setGrados(gradosRes.data);
-        } catch (error) {
-            console.error("Error cargando filtros:", error);
-        }
-    };
 
     const cargarAlumnosYNotas = async () => {
         if (!bimestreSeleccionado || !gradoSeleccionado) {
             Swal.fire("Atención", "Por favor, selecciona un bimestre y un grado.", "info");
             return;
         }
-        console.log("Cargando alumnos con:", { gradoSeleccionado, bimestreSeleccionado, codigoCurso });
+        const curso = auth.usuario?.codigoCurso;
+        if (!curso) {
+            Swal.fire("Error", "No se ha podido identificar el curso del profesor.", "error");
+            return;
+        }
+        console.log("Cargando alumnos con:", { gradoSeleccionado, bimestreSeleccionado, codigoCurso: curso });
         try {
-            const alumnosRes = await axios.get(`http://localhost:8080/notas/alumnos?codigoGrado=${gradoSeleccionado}&idBimestre=${bimestreSeleccionado}&codigoCurso=${codigoCurso}`);
+            const alumnosRes = await apiClient.get(`/notas/alumnos?codigoGrado=${gradoSeleccionado}&idBimestre=${bimestreSeleccionado}&codigoCurso=${curso}`);
             console.log("Respuesta del backend:", alumnosRes.data);
             setAlumnos(alumnosRes.data);
             if (alumnosRes.data.length === 0) {
@@ -67,17 +59,22 @@ function ComponenteProNotas() {
             return;
         }
 
+        const curso = auth.usuario?.codigoCurso;
+        if (!curso) {
+            Swal.fire("Error", "No se ha podido identificar el curso del profesor para guardar la nota.", "error");
+            return;
+        }
         try {
             if (accion === "AGREGAR") {
-                await axios.post("http://localhost:8080/nota/add", {
+                await apiClient.post("/nota/add", {
                     dniAlumno: dni,
-                    codigoCurso: codigoCurso,
+                    codigoCurso: curso,
                     idBimestre: bimestreSeleccionado,
                     nota: nota,
                 });
                 Swal.fire("¡Nota agregada!", "", "success");
             } else {
-                await axios.put(`http://localhost:8080/nota/update`, {
+                await apiClient.put("/nota/update", {
                     idNota: idNota,
                     nota: nota,
                 });
@@ -93,8 +90,24 @@ function ComponenteProNotas() {
 
 
     useEffect(() => {
-        cargarFiltrosIniciales();
-    }, [codigoCurso]);
+        const cargarFiltros = async () => {
+            const curso = auth.usuario?.codigoCurso;
+            if (curso) {
+                try {
+                    const [bimestreRes, gradosRes] = await Promise.all([
+                        apiClient.get("/bimestre/activos"),
+                        apiClient.get(`/grado_curso/filtrar/${curso}`)
+                    ]);
+                    setBimestres(bimestreRes.data);
+                    setGrados(gradosRes.data);
+                } catch (error) {
+                    console.error("Error cargando filtros:", error);
+                    Swal.fire("Error", "No se pudieron cargar los filtros iniciales.", "error");
+                }
+            }
+        };
+        cargarFiltros();
+    }, [auth.usuario]);
 
 
     return (
