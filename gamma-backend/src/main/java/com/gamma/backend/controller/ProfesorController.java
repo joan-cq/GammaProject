@@ -42,19 +42,36 @@ public class ProfesorController {
     private LogService logService;
 
     @GetMapping("/profesor/list")
-    public ResponseEntity<List<Profesor>> listarProfesores() {
+    public ResponseEntity<List<Map<String, Object>>> listarProfesores() {
         List<Profesor> profesores = profesorRepository.findAll();
+        List<Map<String, Object>> profesoresDTO = new java.util.ArrayList<>();
+
         for (Profesor profesor : profesores) {
-            if (profesor.getUser() != null && profesor.getCurso() != null && profesor.getAnioEscolar() != null) {
-                profesor.setCodigoCurso(profesor.getCurso().getNombre());
-                profesor.setRol(profesor.getUser().getRol());
-                profesor.setClave(profesor.getUser().getClave());
-                profesor.setAnio(profesor.getAnioEscolar().getAnio());
+            Map<String, Object> dto = new java.util.LinkedHashMap<>();
+            dto.put("dni", profesor.getDni());
+            dto.put("nombre", profesor.getNombre());
+            dto.put("apellido", profesor.getApellido());
+            dto.put("celular", profesor.getCelular());
+            dto.put("estado", profesor.getEstado());
+
+            if (profesor.getCurso() != null) {
+                dto.put("codigoCurso", profesor.getCurso().getNombre());
+            } else {
+                dto.put("codigoCurso", null);
             }
+
+            if (profesor.getAnioEscolar() != null) {
+                dto.put("anio", profesor.getAnioEscolar().getAnio());
+            } else {
+                dto.put("anio", null);
+            }
+            
+            profesoresDTO.add(dto);
         }
+
         logger.info("Listado de profesores solicitado.");
         logService.addLog("INFO", "Se ha listado los profesores.");
-        return ResponseEntity.ok(profesores);
+        return ResponseEntity.ok(profesoresDTO);
     }
 
     @PutMapping("/profesor/update")
