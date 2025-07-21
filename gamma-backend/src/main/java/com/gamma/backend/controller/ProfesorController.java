@@ -5,6 +5,7 @@ import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.ProfesorRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.LogService;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,9 @@ public class ProfesorController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LogService logService;
+
     @GetMapping("/profesor/list")
     public ResponseEntity<List<Profesor>> listarProfesores() {
         List<Profesor> profesores = profesorRepository.findAll();
@@ -49,6 +53,7 @@ public class ProfesorController {
             }
         }
         logger.info("Listado de profesores solicitado.");
+        logService.addLog("INFO", "Se ha listado los profesores.");
         return ResponseEntity.ok(profesores);
     }
 
@@ -82,6 +87,7 @@ public class ProfesorController {
 
             Profesor profesorActualizado = profesorRepository.save(profesorExistente);
             logger.info("Profesor con DNI {} actualizado.", dni);
+            logService.addLog("INFO", "Se ha actualizado el profesor con DNI: " + dni);
             return ResponseEntity.ok(profesorActualizado);
         } else {
             logger.warn("Intento de actualizar profesor con DNI {} que no existe.", dni);
@@ -125,6 +131,7 @@ public class ProfesorController {
 
         profesorRepository.save(profesor);
         logger.info("Profesor con DNI {} agregado.", dni);
+        logService.addLog("INFO", "Se ha agregado un nuevo profesor con DNI: " + dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Profesor agregado con éxito"));
     }
@@ -147,6 +154,7 @@ public class ProfesorController {
             }
 
             logger.info("Profesor con DNI {} eliminado.", dni);
+            logService.addLog("INFO", "Se ha eliminado el profesor con DNI: " + dni);
             return ResponseEntity.ok(Map.of("mensaje", "Profesor eliminado con éxito"));
         } else {
             logger.warn("Intento de eliminar profesor con DNI {} que no existe.", dni);

@@ -13,3 +13,4 @@ export { default as ComponenteUpdatePassword } from "./ComponenteUpdatePassword"
 export { default as ComponenteProNotas } from "./ComponenteProNotas";
 export { default as ComponenteProfesores } from "./ComponenteProfesores";
 export { default as ComponenteAnioEscolar } from "./ComponenteAnioEscolar";
+export { default as ComponenteLogs } from "./ComponenteLogs";

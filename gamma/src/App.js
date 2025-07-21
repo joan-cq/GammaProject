@@ -9,7 +9,7 @@ import './App.css';
 // Importaciones de imágenes
 import LogoGamma from './recursos/insignia.jpg';
 // Importaciones Componentes
-import { ComponenteAnioEscolar, ComponenteProfesores, ComponenteProNotas, ComponenteAlumnos, ComponenteCursos, ComponenteAdmin, ComponenteNotas, ComponenteContacto, ComponenteInicio, ComponenteLogin, ComponenteLogros, ComponenteNosotros, ComponenteUpdatePassword} from "./componentes"
+import { ComponenteAnioEscolar, ComponenteProfesores, ComponenteProNotas, ComponenteAlumnos, ComponenteCursos, ComponenteAdmin, ComponenteNotas, ComponenteContacto, ComponenteInicio, ComponenteLogin, ComponenteLogros, ComponenteNosotros, ComponenteUpdatePassword, ComponenteLogs} from "./componentes"
 
 // Contexto de autenticación
 export const AuthContext = createContext(null);
@@ -91,6 +91,7 @@ function App() {
                         <Route path="/panel/listamaestros" element={<RutaProtegida><ComponenteProfesores /></RutaProtegida>} />
                         <Route path="/panel/updatepassword" element={<RutaProtegida><ComponenteUpdatePassword /></RutaProtegida>} />
                         <Route path="/panel/anioescolar" element={<RutaProtegida><ComponenteAnioEscolar /></RutaProtegida>} />
+                        <Route path="/panel/logs" element={<RutaProtegida><ComponenteLogs /></RutaProtegida>} />
                     </Routes>
                 </Router>
             </AuthContext.Provider>

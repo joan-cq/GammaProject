@@ -16,6 +16,7 @@ function ComponentePanel() {
             <Link to="/panel/listaadmin">Listado Administradores</Link>
             <Link to="/panel/listamaestros">Listado Profesores</Link>
             <Link to="/panel/anioescolar">Año Activo</Link>
+            <Link to="/panel/logs">Logs</Link>
             <button onClick={handleLogout} className="btn btn-danger">Cerrar Sesión</button>
         </nav>
     );

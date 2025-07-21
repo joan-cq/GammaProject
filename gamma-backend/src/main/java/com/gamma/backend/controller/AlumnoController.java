@@ -6,6 +6,7 @@ import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AlumnoRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.LogService;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,9 @@ public class AlumnoController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LogService logService;
+
     @GetMapping("/alumno/list")
     public ResponseEntity<List<Alumno>> listarAlumnos() {
         List<Alumno> alumnos = alumnoRepository.findAll();
@@ -52,6 +56,7 @@ public class AlumnoController {
             }
         }
         logger.info("Listado de alumnos solicitado.");
+        logService.addLog("INFO", "Se ha listado los alumnos.");
         return ResponseEntity.ok(alumnos);
     }
 
@@ -85,6 +90,7 @@ public class AlumnoController {
 
             Alumno alumnoActualizado = alumnoRepository.save(alumnoExistente);
             logger.info("Alumno con DNI {} actualizado.", dni);
+            logService.addLog("INFO", "Se ha actualizado el alumno con DNI: " + dni);
             return ResponseEntity.ok(alumnoActualizado);
         } else {
             logger.warn("Intento de actualizar alumno con DNI {} que no existe.", dni);
@@ -131,6 +137,7 @@ public class AlumnoController {
 
         alumnoRepository.save(alumno);
         logger.info("Alumno con DNI {} agregado.", dni);
+        logService.addLog("INFO", "Se ha agregado un nuevo alumno con DNI: " + dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Alumno agregado con éxito"));
     }
@@ -153,6 +160,7 @@ public class AlumnoController {
             }
 
             logger.info("Alumno con DNI {} eliminado.", dni);
+            logService.addLog("INFO", "Se ha eliminado el alumno con DNI: " + dni);
             return ResponseEntity.ok(Map.of("mensaje", "Alumno eliminado con éxito"));
         } else {
             logger.warn("Intento de eliminar alumno con DNI {} que no existe.", dni);

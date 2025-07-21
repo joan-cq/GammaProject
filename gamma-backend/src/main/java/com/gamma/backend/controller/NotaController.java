@@ -7,6 +7,7 @@ import com.gamma.backend.repository.AlumnoRepository;
 import com.gamma.backend.repository.NotaRepository;
 import com.gamma.backend.repository.BimestreRepository;
 import com.gamma.backend.repository.CursoRepository;
+import com.gamma.backend.service.LogService;
 import com.gamma.backend.service.modelservice.NotaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,9 @@ public class NotaController {
     @Autowired
     private CursoRepository cursoRepository;
 
+    @Autowired
+    private LogService logService;
+
     @GetMapping("/notas/alumnos")
     public ResponseEntity<?> obtenerAlumnosPorGradoBimestreCurso(
             @RequestParam String codigoGrado,
@@ -67,6 +71,7 @@ public class NotaController {
             return alumnoConNota;
         }).collect(Collectors.toList());
 
+        logService.addLog("INFO", "Se han listado las notas de los alumnos del grado " + codigoGrado + " para el curso " + codigoCurso + " y bimestre " + idBimestre);
         return ResponseEntity.ok(alumnosConNotas);
     }
 
@@ -86,6 +91,7 @@ public class NotaController {
         nota.setNota(notaValue.doubleValue());
 
         notaService.guardarNota(nota);
+        logService.addLog("INFO", "Se ha agregado una nueva nota para el alumno con DNI: " + dniAlumno);
 
         return ResponseEntity.ok(Map.of("mensaje", "Nota agregada correctamente"));
     }
@@ -99,6 +105,7 @@ public class NotaController {
         nota.setNota(notaValue.doubleValue());
 
         notaService.actualizarNota(nota);
+        logService.addLog("INFO", "Se ha actualizado la nota con ID: " + idNota);
 
         return ResponseEntity.ok(Map.of("mensaje", "Nota actualizada correctamente"));
     }

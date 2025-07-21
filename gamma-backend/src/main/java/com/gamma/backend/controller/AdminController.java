@@ -5,6 +5,7 @@ import com.gamma.backend.model.AnioEscolar;
 import com.gamma.backend.model.User;
 import com.gamma.backend.repository.AdministradorRepository;
 import com.gamma.backend.repository.UserRepository;
+import com.gamma.backend.service.LogService;
 import com.gamma.backend.service.modelservice.AnioEscolarService;
 
 import org.slf4j.Logger;
@@ -33,6 +34,9 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LogService logService;
+
     @GetMapping("/admin/list")
     public ResponseEntity<List<Administrador>> listarAdministradores() {
         List<AnioEscolar> aniosActivos = anioEscolarService.obtenerAniosActivos();
@@ -53,6 +57,7 @@ public class AdminController {
         }
 
         logger.info("Listado de administradores solicitado.");
+        logService.addLog("INFO", "Se ha listado los administradores.");
         return ResponseEntity.ok(administradores);
     }
 
@@ -82,6 +87,7 @@ public class AdminController {
 
             Administrador administradorActualizado = administradorRepository.save(administradorExistente);
             logger.info("Administrador con DNI {} actualizado.", administrador.getDni());
+            logService.addLog("INFO", "Se ha actualizado el administrador con DNI: " + administrador.getDni());
             return ResponseEntity.ok(administradorActualizado);
         } else {
             logger.warn("Intento de actualizar administrador con DNI {} que no existe.", administrador.getDni());
@@ -119,6 +125,7 @@ public class AdminController {
         administrador.setEstado("ACTIVO");
         administradorRepository.save(administrador);
         logger.info("Administrador con DNI {} agregado.", dni);
+        logService.addLog("INFO", "Se ha agregado un nuevo administrador con DNI: " + dni);
 
         return ResponseEntity.ok(Map.of("mensaje", "Administrador agregado con éxito"));
     }
@@ -141,6 +148,7 @@ public class AdminController {
             }
 
             logger.info("Administrador con DNI {} eliminado.", dni);
+            logService.addLog("INFO", "Se ha eliminado el administrador con DNI: " + dni);
             return ResponseEntity.ok(Map.of("mensaje", "Administrador eliminado con éxito"));
         } else {
             logger.warn("Intento de eliminar administrador con DNI {} que no existe.", dni);
