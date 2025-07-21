@@ -5,6 +5,8 @@ import { ComponentePanelAdmin } from './index';
 const ComponenteLogs = () => {
     const [logs, setLogs] = useState([]);
     const [filtro, setFiltro] = useState('todos');
+    const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+    const [profesorDropdownOpen, setProfesorDropdownOpen] = useState(false);
 
     useEffect(() => {
         const fetchLogs = async () => {
@@ -37,23 +39,23 @@ const ComponenteLogs = () => {
                 <button type="button" className="btn btn-primary" onClick={() => filtrarLogs('todos')}>Todos</button>
                 <button type="button" className="btn btn-info" onClick={() => filtrarLogs('login')}>Inicios de Sesión</button>
                 <div className="btn-group" role="group">
-                    <button id="adminDropdown" type="button" className="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button id="adminDropdown" type="button" className="btn btn-secondary dropdown-toggle" onClick={() => setAdminDropdownOpen(!adminDropdownOpen)} aria-expanded={adminDropdownOpen}>
                         Administradores
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="adminDropdown">
-                        <li><a className="dropdown-item" href="#" onClick={() => filtrarLogs('alumnos')}>Alumnos</a></li>
-                        <li><a className="dropdown-item" href="#" onClick={() => filtrarLogs('cursos')}>Cursos</a></li>
-                        <li><a className="dropdown-item" href="#" onClick={() => filtrarLogs('administradores')}>Administradores</a></li>
-                        <li><a className="dropdown-item" href="#" onClick={() => filtrarLogs('profesores')}>Profesores</a></li>
-                        <li><a className="dropdown-item" href="#" onClick={() => filtrarLogs('año escolar')}>Año Activo</a></li>
+                    <ul className={`dropdown-menu ${adminDropdownOpen ? 'show' : ''}`} aria-labelledby="adminDropdown">
+                        <li><a className="dropdown-item" href="#" onClick={() => { filtrarLogs('alumnos'); setAdminDropdownOpen(false); }}>Alumnos</a></li>
+                        <li><a className="dropdown-item" href="#" onClick={() => { filtrarLogs('cursos'); setAdminDropdownOpen(false); }}>Cursos</a></li>
+                        <li><a className="dropdown-item" href="#" onClick={() => { filtrarLogs('administradores'); setAdminDropdownOpen(false); }}>Administradores</a></li>
+                        <li><a className="dropdown-item" href="#" onClick={() => { filtrarLogs('profesores'); setAdminDropdownOpen(false); }}>Profesores</a></li>
+                        <li><a className="dropdown-item" href="#" onClick={() => { filtrarLogs('año escolar'); setAdminDropdownOpen(false); }}>Año Activo</a></li>
                     </ul>
                 </div>
                 <div className="btn-group" role="group">
-                    <button id="profesorDropdown" type="button" className="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button id="profesorDropdown" type="button" className="btn btn-secondary dropdown-toggle" onClick={() => setProfesorDropdownOpen(!profesorDropdownOpen)} aria-expanded={profesorDropdownOpen}>
                         Profesores
                     </button>
-                    <ul className="dropdown-menu" aria-labelledby="profesorDropdown">
-                        <li><a className="dropdown-item" href="#" onClick={() => filtrarLogs('notas')}>Notas</a></li>
+                    <ul className={`dropdown-menu ${profesorDropdownOpen ? 'show' : ''}`} aria-labelledby="profesorDropdown">
+                        <li><a className="dropdown-item" href="#" onClick={() => { filtrarLogs('notas'); setProfesorDropdownOpen(false); }}>Notas</a></li>
                     </ul>
                 </div>
             </div>
