@@ -22,11 +22,11 @@ function ComponenteUpdatePassword({ fetchListarUsuarios, dni,nombre, apellido, o
     }
 
     try {
-      let url = `http://localhost:8080/admin/updatePassword/${dni}`;
+      let url = `https://api.my-app-domain.com/admin/updatePassword/${dni}`;
       if (tipoUsuario === 'alumno') {
-        url = `http://localhost:8080/alumno/updatePassword/${dni}`;
+        url = `https://api.my-app-domain.com/alumno/updatePassword/${dni}`;
       } else if (tipoUsuario === 'profesor') {
-        url = `http://localhost:8080/profesor/updatePassword/${dni}`;
+        url = `https://api.my-app-domain.com/profesor/updatePassword/${dni}`;
       }
 
       const response = await fetch(url, {

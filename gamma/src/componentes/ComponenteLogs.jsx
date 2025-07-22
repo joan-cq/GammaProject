@@ -11,7 +11,7 @@ const ComponenteLogs = () => {
     useEffect(() => {
         const fetchLogs = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/logs');
+                const response = await axios.get('https://api.my-app-domain.com/logs');
                 setLogs(response.data);
             } catch (error) {
                 console.error('Error al obtener los logs:', error);

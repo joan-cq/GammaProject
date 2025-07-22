@@ -78,6 +78,7 @@ function App() {
                     </Navbar>
                     <Routes>
                         <Route index path='/gamma' element={<Navigate to="/inicio" />}/>
+                        <Route path="/" element={<Navigate to="/inicio" replace />} />
                         <Route path='/inicio' element={<ComponenteInicio />}/>
                         <Route path='/nosotros' element={<ComponenteNosotros />}/>
                         <Route path='/logros' element={<ComponenteLogros />}/>

@@ -20,7 +20,7 @@ function ComponenteNotas() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
+            const response = await fetch('https://api.my-app-domain.com/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ dni, clave: password }),
@@ -66,24 +66,24 @@ function ComponenteNotas() {
             const token = localStorage.getItem('token');
             const authHeader = { 'Authorization': `Bearer ${token}` };
 
-            const alumnosResponse = await fetch('http://localhost:8080/alumno/list', { headers: authHeader });
+            const alumnosResponse = await fetch('https://api.my-app-domain.com/alumno/list', { headers: authHeader });
             const alumnosData = await alumnosResponse.json();
             const currentAlumno = alumnosData.find(a => a.dni === alumnoDni);
             if (!currentAlumno) throw new Error("No se encontraron los datos del alumno.");
             setAlumno(currentAlumno);
 
-            const aniosResponse = await fetch('http://localhost:8080/anioescolar/list', { headers: authHeader });
+            const aniosResponse = await fetch('https://api.my-app-domain.com/anioescolar/list', { headers: authHeader });
             const aniosData = await aniosResponse.json();
             const activeYear = aniosData.find(a => a.estado === 'ACTIVO');
             setAnioActivo(activeYear ? activeYear.anio : 'No definido');
 
-            const gradosResponse = await fetch('http://localhost:8080/grado/list', { headers: authHeader });
+            const gradosResponse = await fetch('https://api.my-app-domain.com/grado/list', { headers: authHeader });
             const gradosData = await gradosResponse.json();
             const currentGrado = gradosData.find(g => g.codigoGrado === currentAlumno.codigoGrado);
             setGrado(currentGrado);
 
             if (currentAlumno.codigoGrado) {
-                const cursosResponse = await fetch(`http://localhost:8080/grado_curso/cursos/${currentAlumno.codigoGrado}`, { headers: authHeader });
+                const cursosResponse = await fetch(`https://api.my-app-domain.com/grado_curso/cursos/${currentAlumno.codigoGrado}`, { headers: authHeader });
                 const cursosData = await cursosResponse.json();
                 setCursos(cursosData);
             }
@@ -106,7 +106,7 @@ function ComponenteNotas() {
         if (cursoSeleccionado && alumno && grado) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:8080/notas/alumnos?codigoGrado=${grado.codigoGrado}&idBimestre=${bimestre}&codigoCurso=${cursoSeleccionado.codigoCurso}`, {
+                const response = await fetch(`https://api.my-app-domain.com/notas/alumnos?codigoGrado=${grado.codigoGrado}&idBimestre=${bimestre}&codigoCurso=${cursoSeleccionado.codigoCurso}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -125,7 +125,7 @@ function ComponenteNotas() {
         setBimestreSeleccionado(null);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:8080/notas/alumno/${alumno.dni}`, {
+            const response = await fetch(`https://api.my-app-domain.com/notas/alumno/${alumno.dni}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
