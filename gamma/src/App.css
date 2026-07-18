@@ -1,0 +1,147 @@
+/* Titulos */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Kaushan+Script&display=swap');
+/* Textos */
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+* {
+    padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    font-family: "Montserrat";
+    font-weight: 400;
+    user-select: none;
+}
+/* Barra de navegacion */
+#navbar{
+    background-color: white;
+    height: 100px;
+    padding: 15px ;
+    outline: 2px solid #3E327E;
+}
+.barra-nav a{
+    font-family: 'Montserrat';
+    font-weight: bold;
+    font-size: 15px;
+    color: #3E327E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.barra-nav a:hover{
+    color: #970013;
+}
+.titulo {
+    width: 50%;
+    text-align: center;
+    margin-left: 150px;
+    padding: 20px;
+    font-size: 45px;
+    font-weight: bold;
+    color: white;
+    font-family: "Caveat";
+    color: #970013;
+}
+.navbar{
+    margin-top: 0;
+    padding: 0;
+    position: sticky;
+    top: 0px;
+    height: 100px;
+    transition: top 0.5s ease;
+    -webkit-transition: top 0.5s ease;
+    -moz-transition: top 0.5s ease;
+    -ms-transition: top 0.5s ease;
+    -o-transition: top 0.5s ease;
+    z-index: 9999;
+}
+.navbar-collapse{
+    align-items: center;
+    justify-content: end;
+    margin: 0;
+    padding: 0;
+}
+.navbar img {
+    width: 80px;
+    height: 80px;
+}
+.navbar #login {
+    background-color: #FFD720;
+    border-radius: 15px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    -ms-border-radius: 15px;
+    -o-border-radius: 15px;
+    padding: 0 5px;
+}
+/* Pie de página */
+.seccion-pie {
+    height: auto;
+    background-color: #3E327E;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: 
+    "direccion horario contactanos"
+    "iconos iconos iconos"
+    "derecho derecho derecho"
+    ;
+    grid-template-rows: 150px auto;
+    color: white;
+    padding: 0;
+}
+.seccion-pie div:nth-child(1) {
+    grid-area: direccion;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.seccion-pie div:nth-child(2) {
+    grid-area: horario;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.seccion-pie div:nth-child(3) {
+    grid-area: contactanos;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.seccion-pie div:nth-child(4) {
+    grid-area: iconos;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding-bottom: 10px;
+}
+.seccion-pie div:nth-child(5) {
+    grid-area: derecho;
+    font-size: 13px;
+    font-weight: 100;
+    text-align: center;
+    padding-bottom: 5px;
+}
+.seccion-pie div:nth-child(4) a {
+    text-decoration: none;
+    color: white;
+}
+.seccion-pie div:nth-child(4) i {
+    font-size: 25px;
+}
+.seccion-pie h1 {
+    font-size: 30px;
+}
+.seccion-pie h3 {
+    font-size: 16px;
+    font-weight: 100;
+}
+.titulo-logros {
+    font-size: 50px;
+    font-family: "Caveat";
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 30px;
+}

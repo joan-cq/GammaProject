@@ -1,0 +1,312 @@
+/* Seccion Imagen Principal */
+.imagen-princi {
+    height: 600px;
+    background-image: url("../recursos/IMAGEN2.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+/* SVG */
+.svg {
+    overflow: hidden;
+}
+svg {
+    fill: #970013; 
+    width: 100%;
+    height: 155px; 
+    transform: scaleX(-1);
+}
+/* Seccion Contenedor Grados */
+.contenedorGrados {
+    height: 420px;
+    gap: 20px;
+    padding: 20px;
+    margin-bottom: 50px;
+}
+.contenedorGrados .subContenedoresGrados {
+    height: 100%;
+    width: 350px;
+    gap: 20px;
+}
+.contenedorGrados .subContenedoresGrados img {
+    height: 100%;
+    width: 350px;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, .8));
+    -webkit-filter: drop-shadow(0 0 10px rgba(0, 0, 0, .8));
+}
+.contenedorGrados .subContenedoresGrados button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    -ms-border-radius: 20px;
+    -o-border-radius: 20px;
+    background-color: #970013;
+    border: 2px solid #FFD720;
+    color: white;
+    font-family: "Montserrat";
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+    cursor: context-menu;
+}
+.contenedorGrados .subContenedoresGrados button:hover {
+    background-color: #FFD720;
+    border: 2px solid black;
+    color: black;
+}
+/* Seccion Propuesta */
+.seccion-propuesta {
+    height: 500px;
+    padding: 0;
+    margin-bottom: 150px;
+}
+.seccion-propuesta .row {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+.seccion-propuesta .row .imagen video{
+    width: 100%;
+    height: 100%;
+}
+.seccion-propuesta .row .informacion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 20px;
+}
+.seccion-propuesta .row .informacion h1 {
+    font-size: 50px;
+    font-family: "Caveat";
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.seccion-propuesta .row .informacion p {
+    font-family: "Montserrat";
+    font-weight: 400;
+    text-align: justify;
+}
+/* Seccion Video */
+.video {
+    height: 400px;
+    padding: 0;
+}
+.video video {
+    width: 100%;
+    height: 100%;
+}
+/* Seccion Valores */
+.seccion-valores {
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    margin-bottom: 50px;
+    padding: 20px;
+}
+.titulo-valores {
+    padding: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-family: "Caveat";
+    font-size: 50px;
+}
+.seccion-valores .maincontainer {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+.seccion-valores .maincontainer i {
+    font-size: 40px;
+}
+.seccion-valores .maincontainer .card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: all ease-in-out 0.5s;
+    -webkit-transition: all ease-in-out 0.5s;
+    -moz-transition: all ease-in-out 0.5s;
+    -ms-transition: all ease-in-out 0.5s;
+    -o-transition: all ease-in-out 0.5s;
+    border-radius: 30px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    -ms-border-radius: 30px;
+    -o-border-radius: 30px;
+}
+.seccion-valores .maincontainer .card:hover {
+    transform: rotateX(180deg);
+    -webkit-transform: rotateX(180deg);
+    -moz-transform: rotateX(180deg);
+    -ms-transform: rotateX(180deg);
+    -o-transform: rotateX(180deg);
+}
+.seccion-valores .maincontainer .card .thefront {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #970013;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding: 5px;
+    outline: 2px solid #FFD720;
+    border-radius: 30px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    -ms-border-radius: 30px;
+    -o-border-radius: 30px;
+}
+.seccion-valores .maincontainer .card .theback {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background-color: #FFD720;
+    color: black;
+    border: 2px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    transform: rotateX(180deg);
+    -webkit-transform: rotateX(180deg);
+    -moz-transform: rotateX(180deg);
+    -ms-transform: rotateX(180deg);
+    -o-transform: rotateX(180deg);
+    text-align: center;
+    padding: 10px;
+    border-radius: 30px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    -ms-border-radius: 30px;
+    -o-border-radius: 30px;
+}
+.seccion-valores .maincontainer .card .theback p {
+    font-size: 14px;
+    font-family: "Montserrat";
+    font-weight: 400;
+}
+/* Seccion Convenio */
+.seccion-convenio {
+    height: auto;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.seccion-convenio h2 {
+    text-align: center;
+    font-weight: bold;
+    font-family: "Caveat";
+    font-size: 50px;
+}
+.seccion-convenio .contenedor-convenios {
+    display: flex; 
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 20px;
+}
+.contenedor-convenios img {
+    width: 300px;
+    filter: grayscale(1);
+    -webkit-filter: grayscale(1);
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.contenedor-convenios img:hover {
+    filter: grayscale(0);
+    -webkit-filter: grayscale(0);
+}
+/* Seccion Imagenes */
+.seccion-imagenes {
+    background-color: #970013;
+    height: auto;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+.seccion-imagenes .contenedor-tes {
+    background-color: white;
+    outline: 1px solid #3E327E;
+    border-radius: 30px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    -ms-border-radius: 30px;
+    -o-border-radius: 30px;
+    width: 23%;
+    height: 100px;
+    transition: all ease-in-out 0.3s;
+    -webkit-transition: all ease-in-out 0.3s;
+    -moz-transition: all ease-in-out 0.3s;
+    -ms-transition: all ease-in-out 0.3s;
+    -o-transition: all ease-in-out 0.3s;
+}
+.seccion-imagenes .contenedor-tes p {
+    visibility: hidden;
+    text-align: center;
+    width: 90%;
+    margin: 5px auto;
+    font-size: 12px;
+    transition: all ease-in-out 0.4s;
+    -webkit-transition: all ease-in-out 0.4s;
+    -moz-transition: all ease-in-out 0.4s;
+    -ms-transition: all ease-in-out 0.4s;
+    -o-transition: all ease-in-out 0.4s;
+}
+.seccion-imagenes .contenedor-tes:hover{
+    height: 250px;
+}
+.seccion-imagenes .contenedor-tes:hover p{
+    font-size: 12px;
+    visibility: visible;
+}
+.seccion-imagenes .contenedor-tes .subcontenedor-tes {
+    padding: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.seccion-imagenes .contenedor-tes .subcontenedor-tes h6{
+    font-size: 15px;
+    font-family: "Montserrat";
+}
+.seccion-imagenes img {
+    border-radius: 100%;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    -o-border-radius: 100%;
+    width: 70px;
+    height: 70px;
+}
+
+
+

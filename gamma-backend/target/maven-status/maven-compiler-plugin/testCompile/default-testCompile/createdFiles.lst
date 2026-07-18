@@ -1,0 +1,6 @@
+com\gamma\backend\controller\GradoControllerTest.class
+com\gamma\backend\controller\AlumnoControllerTest.class
+com\gamma\backend\controller\NotaControllerTest.class
+com\gamma\backend\controller\AdminControllerTest.class
+com\gamma\backend\controller\BimestreControllerTest.class
+com\gamma\backend\controller\GradoCursoControllerTest.class
